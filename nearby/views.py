@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from . import models
 import math
+import json
+import urllib.request
+
 def dist(lon1,lat1,lon2,lat2):
     radius=6371.004
     pi=math.pi
@@ -15,6 +18,29 @@ def dist(lon1,lat1,lon2,lat2):
 def nearbyAsk(request):
     lon=eval(request.GET['lon'])
     lat=eval(request.GET['lat'])
+    citycode='CN'+request.GET['citycode']+'00000000'
+
+    response=urllib.request.urlopen('https://interface.sina.cn/news/wap/fymap2020_data.d.json')
+    sinaData=json.loads(response.read().decode('utf-8'))
+    cityName='unknown'
+    cityTotalNum='unknown'
+    cityExistNum='unknown'
+    isOversea=0
+    for province in sinaData['data']['list']:
+        for city in province['city']:
+            if(city['citycode']!=''):
+                provincecode=city['citycode'][:4]
+                break
+        if(citycode[:4]!=provincecode):continue
+        for city in province['city']:
+            if(city['citycode']=='' or city['citycode']!=citycode):continue
+            cityName=city['mapName']
+            cityTotalNum=city['conNum']
+            cityExistNum=city['econNum']
+            if(city['jwsr']==''):isOversea=0
+            else:isOversea=1
+    
+
     queryset=models.pois.objects.all()
     mindist=6371.0
     num1,num3,num5=0,0,0
@@ -33,4 +59,4 @@ def nearbyAsk(request):
         elif(tmpdist<5.0):
             num5+=1
     mindist=round(mindist,2);
-    return JsonResponse({'minDist':mindist,'location':minx.poiName,'num1':num1,'num3':num3,'num5':num5},json_dumps_params={'ensure_ascii':False})
+    return JsonResponse({'cityName':cityName,'cityTotalNum':cityTotalNum,'cityExistNum':cityExistNum,'isOversea':isOversea,'minDist':mindist,'location':minx.poiName,'num1':num1,'num3':num3,'num5':num5},json_dumps_params={'ensure_ascii':False})
