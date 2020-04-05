@@ -54,3 +54,9 @@ covid19_be/nearby
 | num2         | 方圆3km内疫情点数目 |
 | num3         | 方圆5km内疫情点数目 |
 
+## 新浪API
+
+### 文档
+
+https://share.mubu.com/doc/2kTqfaDApY7
+

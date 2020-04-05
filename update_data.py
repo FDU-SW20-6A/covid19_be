@@ -5,6 +5,7 @@ import datetime
 import time
 
 def get_data(url,filename):
+
     with requests.get(url) as r:
         if r.status_code == 200:
             data = r.json()  
@@ -13,13 +14,13 @@ def get_data(url,filename):
                     json.dump(data,f,ensure_ascii=False)
             except :
                 print(url,' fail') 
+        else:
+            print(url,' fail') 
     return
     
-if __name__ == '__main__': 
-
-    print("start")
-    starttime = datetime.datetime.now()
     
+def get_sina_api():
+
     url = 'https://interface.sina.cn/news/wap/fymap2020_data.d.json'
     filename = 'sina.json'    
     get_data(url,filename)
@@ -33,8 +34,16 @@ if __name__ == '__main__':
         citycode = dic[i]['citycode']
         url = 'https://gwpre.sina.cn/interface/news/wap/ncp_foreign.d.json?citycode='+citycode
         filename = 'data/country/'+citycode+'.json'
-        get_data(url,filename)    
+        get_data(url,filename)
+        
+    
+if __name__ == '__main__': 
+
+    print("start")
+    starttime = datetime.datetime.now()
+    
+    get_sina_api()    
     
     print("finish")
     endtime = datetime.datetime.now()
-    print(endtime-starttime)
+    print('total time: ',endtime-starttime)
