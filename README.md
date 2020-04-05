@@ -2,6 +2,16 @@
 
 official back-end repo
 
+## 项目运行方法
+
+先决条件：安装Django框架，Python 3.x
+
+```bash
+covid19_be>$ python manage.py runserver
+```
+
+随后访问`127.0.0.1:8000`即可。
+
 ## 附近疫情
 
 ### 路径
