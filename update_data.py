@@ -22,7 +22,7 @@ def get_data(url,filename):
 def get_sina_api():
 
     url = 'https://interface.sina.cn/news/wap/fymap2020_data.d.json'
-    filename = 'sina.json'    
+    filename = 'data/sina.json'    
     get_data(url,filename)
 
     data = json.load(open("data/sina.json"))
