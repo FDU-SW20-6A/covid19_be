@@ -18,10 +18,12 @@ def dist(lon1,lat1,lon2,lat2):
 def nearbyAsk(request):
     lon=eval(request.GET['lon'])
     lat=eval(request.GET['lat'])
-    citycode='CN'+request.GET['citycode']+'00000000'
+    citycode='CN'+request.GET['citycode']
+    citycode=citycode[:6]+'0000000000'
 
-    response=urllib.request.urlopen('https://interface.sina.cn/news/wap/fymap2020_data.d.json')
-    sinaData=json.loads(response.read().decode('utf-8'))
+    #response=urllib.request.urlopen('https://interface.sina.cn/news/wap/fymap2020_data.d.json')
+    #sinaData=json.loads(response.read().decode('utf-8'))
+    sinaData=json.load(open(r'data\sina.json','r',encoding='gbk'))
     cityName='unknown'
     cityTotalNum='unknown'
     cityExistNum='unknown'
