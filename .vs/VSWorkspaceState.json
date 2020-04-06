@@ -1,9 +1,10 @@
 {
   "ExpandedNodes": [
     "",
+    "\\api",
     "\\covid19_be",
     "\\nearby"
   ],
-  "SelectedNode": "\\nearby\\urls.py",
+  "SelectedNode": "\\nearby\\views.py",
   "PreviewInSolutionExplorer": false
 }
