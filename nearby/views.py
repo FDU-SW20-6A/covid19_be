@@ -15,12 +15,7 @@ def dist(lon1,lat1,lon2,lat2):
     tmp=math.sin(lat1)*math.sin(lat2)+math.cos(lat1)*math.cos(lat2)*math.cos(lon1-lon2)
     return radius*math.acos(tmp)
 
-def nearbyAsk(request):
-    lon=eval(request.GET['lon'])
-    lat=eval(request.GET['lat'])
-    citycode='CN'+request.GET['citycode']
-    citycode=citycode[:6]+'0000000000'
-
+def nearbyAsk(lon,lat,citycode):
     #response=urllib.request.urlopen('https://interface.sina.cn/news/wap/fymap2020_data.d.json')
     #sinaData=json.loads(response.read().decode('utf-8'))
     sinaData=json.load(open(r'data\sina.json','r',encoding='gbk'))
@@ -41,7 +36,6 @@ def nearbyAsk(request):
             cityExistNum=city['econNum']
             if(city['jwsr']==''):isOversea=0
             else:isOversea=1
-    
 
     queryset=models.pois.objects.all()
     mindist=6371.0
@@ -62,3 +56,16 @@ def nearbyAsk(request):
             num5+=1
     mindist=round(mindist,2);
     return JsonResponse({'cityName':cityName,'cityTotalNum':cityTotalNum,'cityExistNum':cityExistNum,'isOversea':isOversea,'minDist':mindist,'location':minx.poiName,'num1':num1,'num3':num3,'num5':num5},json_dumps_params={'ensure_ascii':False})
+
+def nearbyQueryAsk(request):
+    lon=eval(request.GET['lon'])
+    lat=eval(request.GET['lat'])
+    citycode='CN'+request.GET['citycode']
+    if(citycode[:4]=='CN50' or citycode[:4]=='CN11' or citycode[:4]=='CN31' or citycode[:4]=='CN12'):citycode+='00000000'
+    else:citycode=citycode[:6]+'0000000000'
+    return nearbyAsk(lon,lat,citycode)
+
+def nearbyInitAsk(request):
+    lon,lat=121.505236,31.300102
+    citycode='CN31011000000000'
+    return nearbyAsk(lon,lat,citycode)

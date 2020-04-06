@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
 urlpatterns = [
-    path('',views.nearbyAsk),
+    path('',views.nearbyQueryAsk),
+    path('init/',views.nearbyInitAsk),
     ]
