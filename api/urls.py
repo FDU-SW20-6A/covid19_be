@@ -8,5 +8,6 @@ urlpatterns = [
     path('overall_world/',views.overall_world),
     path('province_list/',views.province_list),
     path('country_list/',views.country_list),
+    path('history/',views.history),
     ]
     

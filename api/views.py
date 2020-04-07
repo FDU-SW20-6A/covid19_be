@@ -76,3 +76,25 @@ def country_list(request):
         dic[i].pop('is_show_map')
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False)     
  
+def history(request):
+    data = json.load(open("data/sina.json"))
+    data = data['data']['historylist']
+    dic = {}
+    dic['date'] = []
+    dic['conadd'] = []
+    dic['econNum'] = []
+    dic['conNum'] = []
+    dic['cureNum'] = []
+    dic['deathNum'] = []
+    n = len(data)
+    for i in range(n-1,0,-1):
+        dic['date'].append(data[i]['date'])
+        dic['conadd'].append(data[i]['cn_conadd'])
+        dic['econNum'].append(data[i]['cn_econNum'])
+        dic['conNum'].append(data[i]['cn_conNum'])
+        dic['cureNum'].append(data[i]['cn_cureNum'])
+        dic['deathNum'].append(data[i]['cn_deathNum'])
+    return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
+    
+    
+    
