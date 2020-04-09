@@ -8,6 +8,7 @@ urlpatterns = [
     path('overall_world/',views.overall_world),
     path('province_list/',views.province_list),
     path('country_list/',views.country_list),
-    path('history/',views.history),
+    path('history_China/',views.history_China),
+    path('history_world/',views.history_world),
     ]
     

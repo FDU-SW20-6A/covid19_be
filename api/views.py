@@ -76,7 +76,7 @@ def country_list(request):
         dic[i].pop('is_show_map')
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False)     
  
-def history(request):
+def history_China(request):
     data = json.load(open("data/sina.json"))
     data = data['data']['historylist']
     dic = {}
@@ -86,6 +86,8 @@ def history(request):
     dic['conNum'] = []
     dic['cureNum'] = []
     dic['deathNum'] = []
+    dic['cureRate'] = []
+    dic['deathRate'] = []
     n = len(data)
     for i in range(n-1,0,-1):
         dic['date'].append(data[i]['date'])
@@ -94,7 +96,30 @@ def history(request):
         dic['conNum'].append(data[i]['cn_conNum'])
         dic['cureNum'].append(data[i]['cn_cureNum'])
         dic['deathNum'].append(data[i]['cn_deathNum'])
+        dic['cureRate'].append(data[i]['cn_cureRate'])
+        dic['deathRate'].append(data[i]['cn_deathRate'])
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
     
+def history_world(request):
+    data = json.load(open("data/sina.json"))
+    data = data['data']['otherhistorylist']
+    dic = {}
+    dic['date'] = []
+    dic['conadd'] = []
+    dic['conNum'] = []
+    dic['cureNum'] = []
+    dic['deathNum'] = []
+    n = len(data)
+    for i in range(n-1,0,-1):
+        dic['date'].append(data[i]['date'])
+        dic['conadd'].append(data[i]['certain_inc'])
+        dic['conNum'].append(data[i]['certain'])
+        dic['cureNum'].append(data[i]['recure'])
+        dic['deathNum'].append(data[i]['die']) 
+    return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
     
+'''
+with open('history_China.json','w') as f:
+    json.dump(dic,f,ensure_ascii=False)
+'''    
     
