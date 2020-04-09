@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import HttpResponse
 from . import models
 import math
 import json
@@ -38,13 +38,22 @@ def nearbyAsk(lon,lat,citycode):
             else:isOversea=1
 
     queryset=models.pois.objects.all()
-    mindist=6371.0
+    markersNum=10 #更改此常量的值可以控制marker的数量
+
+    mindist=[6371.0 for i in range(markersNum)]
+    minx=[queryset[0] for i in range(markersNum)]
+
     num1,num3,num5=0,0,0
     for x in queryset:
         tmpdist=dist(lon,lat,x.lon,x.lat)
-        if(mindist>tmpdist):
-            mindist=tmpdist
-            minx=x
+        
+        for i in range(markersNum):
+            if(tmpdist<mindist[i]):
+                for j in range(markersNum-1,i,-1):
+                    mindist[j],minx[j]=mindist[j-1],minx[j-1]
+                mindist[i],minx[i]=tmpdist,x
+                break
+
         if(tmpdist<1.0):
             num1+=1
             num3+=1
@@ -54,8 +63,29 @@ def nearbyAsk(lon,lat,citycode):
             num5+=1
         elif(tmpdist<5.0):
             num5+=1
-    mindist=round(mindist,2);
-    return JsonResponse({'cityName':cityName,'cityTotalNum':cityTotalNum,'cityExistNum':cityExistNum,'isOversea':isOversea,'minDist':mindist,'location':minx.poiName,'num1':num1,'num3':num3,'num5':num5},json_dumps_params={'ensure_ascii':False})
+    mindist[0]=round(mindist[0],2);
+    #return JsonResponse({'cityName':cityName,'cityTotalNum':cityTotalNum,'cityExistNum':cityExistNum,'isOversea':isOversea,'minDist':mindist,'location':minx.poiName,'num1':num1,'num3':num3,'num5':num5},json_dumps_params={'ensure_ascii':False})
+    json_data=json.dumps({
+            'mapCenter':{'longitude':lon,'latitude':lat},
+            'address':cityName,
+            'markers':[{'position':{'longitude':minx[i].lon,'latitude':minx[i].lat},'title':minx[i].poiName}for i in range(markersNum)],
+            'city':cityName,
+            'totalCase':cityTotalNum,
+            'currentCase':cityExistNum,
+            'nearDis':mindist[0],
+            'nearLoc':minx[0].poiName,
+            'case1':num1,
+            'case3':num3,
+            'case5':num5,
+        },
+        ensure_ascii=False
+        )
+    response=HttpResponse(json_data)
+    response['Access-Control-Allow-Origin']='*'
+    response['Access-Control-Allow-Methods']='POST,GET,OPTIONS'
+    response['Access-Control-Max-Age']='2000'
+    response['Access-Control-Allow-Headers']='*'
+    return response
 
 def nearbyQueryAsk(request):
     lon=eval(request.GET['lon'])
