@@ -17,15 +17,17 @@ pip3 install django-cors-headers #django-cors-headers安装命令
 sudo easy_install pip            #安装pip（如果已安装可跳过）
 pip3 install django              #django安装命令
 pip3 install django-cors-headers #django-cors-headers安装命令
+pip3 install djangorestframework #django rest framework安装命令
 ```
 
 ### 运行方法
 
 ```bash
-covid19_be>$ python manage.py runserver <端口名># 后端目前使用端口8001
+covid19_be>$ python3 manage.py runserver <端口名># 后端目前使用端口8001
 ```
 
-随后访问`http://localhost:<端口名>`即可。
+随后访问`http://localhost:<端口名>`即可。<br>
+建议前端在无痕模式下启动npm。
 
 ## 附近疫情
 
