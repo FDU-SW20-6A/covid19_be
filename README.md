@@ -6,6 +6,21 @@ official back-end repo
 
 先决条件：安装Django框架，Python 3.x，django-cors-headers
 
+### 安装方法
+
+```bash
+#Windows:
+pip3 install django              #django安装命令
+pip3 install django-cors-headers #django-cors-headers安装命令
+
+#Mac(未尝试):
+sudo easy_install pip            #安装pip（如果已安装可跳过）
+pip3 install django              #django安装命令
+pip3 install django-cors-headers #django-cors-headers安装命令
+```
+
+### 运行方法
+
 ```bash
 covid19_be>$ python manage.py runserver <端口名># 后端目前使用端口8001
 ```
