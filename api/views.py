@@ -118,6 +118,21 @@ def history_world(request):
         dic['deathNum'].append(data[i]['die']) 
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
     
+def rate(request):
+    data = json.load(open("data/sina.json"))
+    data = data['data']['list']
+    lis = []
+    for i in range(len(data)):
+        dic = {}
+        dic['name'] = data[i]['name']
+        dic['ename'] = data[i]['ename']
+        x = 100.0*float(data[i]['cureNum'])/float(data[i]['value'])
+        dic['cureRate'] = format(x,'.2f')
+        x = 100.0*float(data[i]['deathNum'])/float(data[i]['value'])
+        dic['deathRate'] = format(x,'.2f')
+        lis.append(dic)
+    return JsonResponse(lis,json_dumps_params={'ensure_ascii':False},safe=False) 
+    
 '''
 with open('history_China.json','w') as f:
     json.dump(dic,f,ensure_ascii=False)
