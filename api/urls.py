@@ -11,5 +11,6 @@ urlpatterns = [
     path('history_China/',views.history_China),
     path('history_world/',views.history_world),
     path('rate/',views.rate),
+    path('continent/',views.continent),
     ]
     

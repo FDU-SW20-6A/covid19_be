@@ -132,7 +132,13 @@ def rate(request):
         dic['deathRate'] = format(x,'.2f')
         lis.append(dic)
     return JsonResponse(lis,json_dumps_params={'ensure_ascii':False},safe=False) 
+
+def continent(request):
+    lis = []
+    #to do
+    continent_list = ['亚洲','欧洲','非洲','大洋洲','北美洲','南美洲']
     
+    return JsonResponse(lis,json_dumps_params={'ensure_ascii':False},safe=False) 
 '''
 with open('history_China.json','w') as f:
     json.dump(dic,f,ensure_ascii=False)

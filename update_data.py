@@ -9,11 +9,12 @@ def get_data(url,filename):
     with requests.get(url) as r:
         if r.status_code == 200:
             data = r.json()  
-            try:
+            try :
                 with open(filename,'w') as f:
                     json.dump(data,f,ensure_ascii=False)
             except :
-                print(url,' fail') 
+                with open(filename,'w',encoding='utf-8') as f:
+                    f.write(str(data))
         else:
             print(url,' fail') 
     return
