@@ -134,11 +134,9 @@ def rate(request):
     return JsonResponse(lis,json_dumps_params={'ensure_ascii':False},safe=False) 
 
 def continent(request):
-    lis = []
-    #to do
-    continent_list = ['亚洲','欧洲','非洲','大洋洲','北美洲','南美洲']
+    data = json.load(open("data/continent_list.json",encoding='utf-8'))
+    return JsonResponse(data,json_dumps_params={'ensure_ascii':False},safe=False) 
     
-    return JsonResponse(lis,json_dumps_params={'ensure_ascii':False},safe=False) 
 '''
 with open('history_China.json','w') as f:
     json.dump(dic,f,ensure_ascii=False)
