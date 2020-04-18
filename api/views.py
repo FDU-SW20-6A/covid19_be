@@ -4,11 +4,11 @@ from . import models
 import json
 
 def sina_api(request):
-    data = json.load(open("data/sina.json"))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     return JsonResponse(data,json_dumps_params={'ensure_ascii':False})
 
 def province(request):
-    data = json.load(open("data/sina.json"))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     pro = eval(request.GET['province'])
     pro_num = 0
     for i in range(len(data['data']['list'])):
@@ -22,7 +22,7 @@ def province(request):
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False})  
     
 def country(request):
-    data = json.load(open("data/sina.json"))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     country = eval(request.GET['country'])
     country_num = 0
     for i in range(len(data['data']['worldlist'])):
@@ -41,7 +41,7 @@ def country(request):
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False}) 
     
 def overall_China(request):
-    data = json.load(open("data/sina.json"))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     dic = {}
     dic['times'] = data['data']['times']
     dic['mtime'] = data['data']['mtime']
@@ -56,12 +56,12 @@ def overall_China(request):
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False}) 
     
 def overall_world(request):
-    data = json.load(open("data/sina.json"))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     dic = data['data']['othertotal']
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False}) 
     
 def province_list(request):
-    data = json.load(open("data/sina.json"))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     dic = data['data']['list']
     for i in range(len(dic)):
         dic[i].pop('city')
@@ -69,7 +69,7 @@ def province_list(request):
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
 
 def country_list(request):
-    data = json.load(open("data/sina.json"))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     dic = data['data']['otherlist']
     for i in range(len(dic)):
         dic[i].pop('is_show_entrance')
@@ -77,7 +77,7 @@ def country_list(request):
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False)     
  
 def history_China(request):
-    data = json.load(open("data/sina.json"))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     data = data['data']['historylist']
     dic = {}
     dic['date'] = []
@@ -101,7 +101,7 @@ def history_China(request):
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
     
 def history_world(request):
-    data = json.load(open("data/sina.json"))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     data = data['data']['otherhistorylist']
     dic = {}
     dic['date'] = []
@@ -119,7 +119,7 @@ def history_world(request):
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
     
 def rate(request):
-    data = json.load(open("data/sina.json"))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     data = data['data']['list']
     lis = []
     for i in range(len(data)):

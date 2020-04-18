@@ -26,7 +26,7 @@ def get_sina_api():
     filename = 'data/sina.json'    
     get_data(url,filename)
 
-    data = json.load(open("data/sina.json"))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     dic = data['data']['otherlist']
     lis = []
     
@@ -40,8 +40,8 @@ def get_sina_api():
 def continent():
 
     continent_list = ['亚洲','欧洲','非洲','大洋洲','北美洲','南美洲','其它']
-    con = json.load(open('data/continent.json'))
-    data = json.load(open("data/sina.json"))
+    con = json.load(open('data/continent.json',encoding='utf-8'))
+    data = json.load(open("data/sina.json",encoding='utf-8'))
     dic = data['data']['worldlist']
     ans = [{} for i in range(7)]
     for i in range(len(continent_list)):
@@ -49,7 +49,8 @@ def continent():
         ans[i]['country'] = []
         for j in range(len(dic)): 
             name = dic[j]['name']
-            if con[name]==continent_list[i]:
+            #If a new country appears, but we don't know which continent it belongs to, ignore it
+            if name in con and con[name]==continent_list[i]:
                 cdic = {}
                 if name=='中国':
                     sum[0]+=int(data['data']['gntotal'])
@@ -105,7 +106,7 @@ if __name__ == '__main__':
     print("start")
     starttime = datetime.datetime.now()
     
-    #get_sina_api()  
+    get_sina_api()  
     continent()
     
     print("finish")
