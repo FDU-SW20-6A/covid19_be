@@ -1,7 +1,9 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from django.http import JsonResponse
 from . import models
 import json
+import urllib.request
 
 def sina_api(request):
     data = json.load(open("data/sina.json",encoding='utf-8'))
@@ -43,17 +45,26 @@ def country(request):
 def overall_China(request):
     data = json.load(open("data/sina.json",encoding='utf-8'))
     dic = {}
-    dic['times'] = data['data']['times']
-    dic['mtime'] = data['data']['mtime']
-    dic['gntotal'] = data['data']['gntotal']
-    dic['deathtotal'] = data['data']['deathtotal']
-    dic['sustotal'] = data['data']['sustotal']
-    dic['curetotal'] = data['data']['curetotal']
-    dic['econNum'] = data['data']['econNum']
-    dic['heconNum'] = data['data']['heconNum']
-    dic['asymptomNum'] = data['data']['asymptomNum']
-    dic['jwsrNum'] = data['data']['jwsrNum']
-    return JsonResponse(dic,json_dumps_params={'ensure_ascii':False}) 
+    dic['gntotal'] = int(data['data']['gntotal'])
+    dic['deathtotal'] = int(data['data']['deathtotal'])
+    dic['sustotal'] = int(data['data']['sustotal'])
+    dic['curetotal'] = int(data['data']['curetotal'])
+    dic['econNum'] = int(data['data']['econNum'])
+    dic['heconNum'] = int(data['data']['heconNum'])
+    dic['jwsrNum'] = int(data['data']['jwsrNum'])
+    dic['addcon'] = int(data['data']['add_daily']['addcon'])
+    dic['addcure'] = int(data['data']['add_daily']['addcure'])
+    dic['adddeath'] = int(data['data']['add_daily']['adddeath'])
+    dic['addecon_new'] = int(data['data']['add_daily']['addecon_new'])
+    dic['addsus'] = int(data['data']['add_daily']['addsus'])
+    dic['addhecon_new'] = int(data['data']['add_daily']['addhecon_new'])
+    dic = json.dumps(dic,ensure_ascii=False)
+    response = HttpResponse(dic)
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
+    response['Access-Control-Max-Age'] = '2000'
+    response['Access-Control-Allow-Headers'] = '*'
+    return response
     
 def overall_world(request):
     data = json.load(open("data/sina.json",encoding='utf-8'))
@@ -76,7 +87,7 @@ def country_list(request):
         dic[i].pop('is_show_map')
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False)     
  
-def history_China(request):
+def history(request):
     data = json.load(open("data/sina.json",encoding='utf-8'))
     data = data['data']['historylist']
     dic = {}
@@ -98,25 +109,26 @@ def history_China(request):
         dic['deathNum'].append(data[i]['cn_deathNum'])
         dic['cureRate'].append(data[i]['cn_cureRate'])
         dic['deathRate'].append(data[i]['cn_deathRate'])
-    return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
-    
-def history_world(request):
+        
     data = json.load(open("data/sina.json",encoding='utf-8'))
     data = data['data']['otherhistorylist']
-    dic = {}
-    dic['date'] = []
-    dic['conadd'] = []
-    dic['conNum'] = []
-    dic['cureNum'] = []
-    dic['deathNum'] = []
-    n = len(data)
-    for i in range(n-1,0,-1):
-        dic['date'].append(data[i]['date'])
-        dic['conadd'].append(data[i]['certain_inc'])
-        dic['conNum'].append(data[i]['certain'])
-        dic['cureNum'].append(data[i]['recure'])
-        dic['deathNum'].append(data[i]['die']) 
-    return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
+    dic['conaddw'] = [0 for i in range(n)]
+    dic['conNumw'] = [0 for i in range(n)]
+    dic['cureNumw'] = [0 for i in range(n)]
+    dic['deathNumw'] = [0 for i in range(n)]
+    m = len(data)
+    for i in range(m):
+        dic['conaddw'][n-1-i] = data[i]['certain_inc']
+        dic['conNumw'][n-1-i]= data[i]['certain']
+        dic['cureNumw'][n-1-i] = data[i]['recure']
+        dic['deathNumw'][n-1-i] = data[i]['die']   
+    dic = json.dumps(dic,ensure_ascii=False)
+    response = HttpResponse(dic)
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
+    response['Access-Control-Max-Age'] = '2000'
+    response['Access-Control-Allow-Headers'] = '*'
+    return response
     
 def rate(request):
     data = json.load(open("data/sina.json",encoding='utf-8'))

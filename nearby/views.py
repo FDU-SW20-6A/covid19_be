@@ -18,7 +18,7 @@ def dist(lon1,lat1,lon2,lat2):
 def nearbyAsk(lon,lat,citycode):
     #response=urllib.request.urlopen('https://interface.sina.cn/news/wap/fymap2020_data.d.json')
     #sinaData=json.loads(response.read().decode('utf-8'))
-    sinaData=json.load(open(r'data\sina.json','r',encoding='gbk'))
+    sinaData=json.load(open(r'data\sina.json','r',encoding='utf-8'))
     cityName='unknown'
     cityTotalNum='unknown'
     cityExistNum='unknown'
