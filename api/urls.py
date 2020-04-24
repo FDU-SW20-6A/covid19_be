@@ -11,5 +11,6 @@ urlpatterns = [
     path('history/',views.history),
     path('rate/',views.rate),
     path('continent/',views.continent),
+    path('scatter_diagram/',views.scatter_diagram),
     ]
     

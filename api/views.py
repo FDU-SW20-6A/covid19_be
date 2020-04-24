@@ -22,7 +22,8 @@ def province(request):
         item.pop('citycode')
         item.pop('hejian')
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False})  
-    
+
+'''    
 def country(request):
     data = json.load(open("data/sina.json",encoding='utf-8'))
     country = eval(request.GET['country'])
@@ -40,6 +41,12 @@ def country(request):
         city[i].pop('is_show_entrance')
         city[i].pop('is_show_map')
     dic['city'] = city
+    return JsonResponse(dic,json_dumps_params={'ensure_ascii':False}) 
+'''
+
+def country(request):
+    citycode = eval(request.GET['code'])    
+    dic = json.load(open("data/country/"+citycode+".json",encoding='utf-8'))
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False}) 
     
 def overall_China(request):
@@ -100,7 +107,8 @@ def history(request):
     dic['cureRate'] = []
     dic['deathRate'] = []
     n = len(data)
-    for i in range(n-1,0,-1):
+    print(n)
+    for i in range(n-1,-1,-1):
         dic['date'].append(data[i]['date'])
         dic['conadd'].append(data[i]['cn_conadd'])
         dic['econNum'].append(data[i]['cn_econNum'])
@@ -112,10 +120,10 @@ def history(request):
         
     data = json.load(open("data/sina.json",encoding='utf-8'))
     data = data['data']['otherhistorylist']
-    dic['conaddw'] = [0 for i in range(n)]
-    dic['conNumw'] = [0 for i in range(n)]
-    dic['cureNumw'] = [0 for i in range(n)]
-    dic['deathNumw'] = [0 for i in range(n)]
+    dic['conaddw'] = ["0" for i in range(n)]
+    dic['conNumw'] = ["0" for i in range(n)]
+    dic['cureNumw'] = ["0" for i in range(n)]
+    dic['deathNumw'] = ["0" for i in range(n)]
     m = len(data)
     for i in range(m):
         dic['conaddw'][n-1-i] = data[i]['certain_inc']
@@ -148,6 +156,17 @@ def rate(request):
 def continent(request):
     data = json.load(open("data/continent_list.json",encoding='utf-8'))
     return JsonResponse(data,json_dumps_params={'ensure_ascii':False},safe=False) 
+    
+def scatter_diagram(request):
+    data = json.load(open("data/scatter_diagram.json",encoding='utf-8'))
+    dic = json.dumps(data,ensure_ascii=False)
+    response = HttpResponse(dic)
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
+    response['Access-Control-Max-Age'] = '2000'
+    response['Access-Control-Allow-Headers'] = '*'
+    return response
+    
     
 '''
 with open('history_China.json','w') as f:
