@@ -4,6 +4,8 @@ import json
 import datetime
 import time
 
+country_list = ['SCIT0039','SCUS0001','SCKR0082','SCIR0098','SCJP0081','SCFR0033','SCDE0049','SCES0034']
+
 def get_data(url,filename):
 
     with requests.get(url) as r:
@@ -27,12 +29,12 @@ def get_sina_api():
     get_data(url,filename)
 
     data = json.load(open("data/sina.json",encoding='utf-8'))
-    dic = data['data']['otherlist']
-    lis = []
+    dic = data['data']['otherlist']   
     
-    for i in range(len(dic)): 
-        name = dic[i]['name']
-        citycode = dic[i]['citycode']
+    for i in range(len(country_list)): 
+        #name = dic[i]['name']
+        #citycode = dic[i]['citycode']
+        citycode = country_list[i]
         url = 'https://gwpre.sina.cn/interface/news/wap/ncp_foreign.d.json?citycode='+citycode
         filename = 'data/country/'+citycode+'.json'
         if citycode!='': get_data(url,filename)
@@ -99,7 +101,34 @@ def continent():
         ans[i]['deathadd'] = sum[7]
     with open('data/continent_list.json','w',encoding='utf-8') as f:
         json.dump(ans,f,ensure_ascii=False)
-        
+  
+def scatter_diagram():
+    dic = {}
+    for i in range(len(country_list)): 
+        citycode = country_list[i]
+        filename = 'data/country/'+citycode+'.json'
+        data = json.load(open(filename,encoding='utf-8'))
+        coun = data['data']['country']
+        data = data['data']['historylist']
+        clis = []
+        for j in range(30):
+            dlis = []
+            x = 100.0*float(data[j]['cureNum'])/float(data[j]['conNum'])
+            dlis.append(format(x,'.2f'))
+            x = 100.0*float(data[j]['deathNum'])/float(data[j]['conNum'])
+            dlis.append(format(x,'.2f'))
+            dlis.append(data[j]['conNum'])
+            dlis.append(data[j]['cureNum'])
+            dlis.append(data[j]['deathNum'])
+            dlis.append(data[j]['conadd'])
+            dlis.append(data[j]['cureadd'])
+            dlis.append(data[j]['deathadd'])
+            dlis.append(data[j]['date'])   
+            clis.append(dlis)
+        dic[coun] = clis
+    with open('data/scatter_diagram.json','w',encoding='utf-8') as f:
+        json.dump(dic,f,ensure_ascii=False)   
+  
     
 if __name__ == '__main__': 
 
@@ -108,6 +137,7 @@ if __name__ == '__main__':
     
     get_sina_api()  
     continent()
+    scatter_diagram()
     
     print("finish")
     endtime = datetime.datetime.now()
