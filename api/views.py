@@ -21,6 +21,10 @@ def province(request):
     for item in dic['city']:
         item.pop('citycode')
         item.pop('hejian')
+    dic['jwsr_econNum'] = 0
+    for item in dic['city']:
+        if item['name']=='境外输入':
+            dic['jwsr_econNum'] = item['econNum'] 
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False})  
 
 '''    
@@ -107,7 +111,6 @@ def history(request):
     dic['cureRate'] = []
     dic['deathRate'] = []
     n = len(data)
-    print(n)
     for i in range(n-1,-1,-1):
         dic['date'].append(data[i]['date'])
         dic['conadd'].append(data[i]['cn_conadd'])
@@ -166,7 +169,36 @@ def scatter_diagram(request):
     response['Access-Control-Max-Age'] = '2000'
     response['Access-Control-Allow-Headers'] = '*'
     return response
+ 
+def news(request):
+    data = json.load(open("data/news.json",encoding='utf-8'))
+    dic = json.dumps(data,ensure_ascii=False)
+    response = HttpResponse(dic)
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
+    response['Access-Control-Max-Age'] = '2000'
+    response['Access-Control-Allow-Headers'] = '*'
+    return response
     
+def rumor0(request):
+    data = json.load(open("data/rumor0.json",encoding='utf-8'))
+    dic = json.dumps(data,ensure_ascii=False)
+    response = HttpResponse(dic)
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
+    response['Access-Control-Max-Age'] = '2000'
+    response['Access-Control-Allow-Headers'] = '*'
+    return response
+
+def rumor2(request):
+    data = json.load(open("data/rumor2.json",encoding='utf-8'))
+    dic = json.dumps(data,ensure_ascii=False)
+    response = HttpResponse(dic)
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
+    response['Access-Control-Max-Age'] = '2000'
+    response['Access-Control-Allow-Headers'] = '*'
+    return response
     
 '''
 with open('history_China.json','w') as f:

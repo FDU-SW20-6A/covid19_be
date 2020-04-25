@@ -12,5 +12,8 @@ urlpatterns = [
     path('rate/',views.rate),
     path('continent/',views.continent),
     path('scatter_diagram/',views.scatter_diagram),
+    path('news/',views.news),
+    path('rumor0/',views.rumor0),
+    path('rumor2/',views.rumor2),
     ]
     

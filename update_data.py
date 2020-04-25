@@ -5,20 +5,27 @@ import datetime
 import time
 
 country_list = ['SCIT0039','SCUS0001','SCKR0082','SCIR0098','SCJP0081','SCFR0033','SCDE0049','SCES0034']
+fail_tot = 0
 
 def get_data(url,filename):
-
-    with requests.get(url) as r:
-        if r.status_code == 200:
-            data = r.json()  
-            try :
-                with open(filename,'w',encoding='utf-8') as f:
-                    json.dump(data,f,ensure_ascii=False)
-            except :
-                with open(filename,'w',encoding='utf-8') as f:
-                    f.write(str(data))
-        else:
-            print(url,' fail') 
+    
+    limit = 3
+    t = 0
+    while (t<limit):
+        with requests.get(url) as r:
+            if r.status_code == 200:
+                data = r.json()  
+                try :
+                    with open(filename,'w',encoding='utf-8') as f:
+                        json.dump(data,f,ensure_ascii=False)
+                except :
+                    with open(filename,'w',encoding='utf-8') as f:
+                        f.write(str(data))
+                break
+            else:
+                t = t+1
+                time.sleep(0.5)
+        if t==limit: print(url,' fail') 
     return
     
     
@@ -129,7 +136,18 @@ def scatter_diagram():
     with open('data/scatter_diagram.json','w',encoding='utf-8') as f:
         json.dump(dic,f,ensure_ascii=False)   
   
-    
+def news_and_rumors():
+    url = 'https://lab.isaaclin.cn/nCoV/api/news?num=1000'
+    filename = 'data/news.json'    
+    get_data(url,filename)
+    url = 'https://lab.isaaclin.cn/nCoV/api/rumors?num=1000&rumorType=0'
+    filename = 'data/rumor0.json'    
+    get_data(url,filename)
+    url = 'https://lab.isaaclin.cn/nCoV/api/rumors?num=1000&rumorType=2'
+    filename = 'data/rumor2.json'    
+    get_data(url,filename)
+      
+  
 if __name__ == '__main__': 
 
     print("start")
@@ -138,6 +156,7 @@ if __name__ == '__main__':
     get_sina_api()  
     continent()
     scatter_diagram()
+    news_and_rumors()
     
     print("finish")
     endtime = datetime.datetime.now()
