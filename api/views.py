@@ -173,6 +173,7 @@ def scatter_diagram(request):
 def news(request):
     data = json.load(open("data/news.json",encoding='utf-8'))
     dic = json.dumps(data,ensure_ascii=False)
+    #return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
     response = HttpResponse(dic)
     response['Access-Control-Allow-Origin'] = '*'
     response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
@@ -193,6 +194,37 @@ def rumor0(request):
 def rumor2(request):
     data = json.load(open("data/rumor2.json",encoding='utf-8'))
     dic = json.dumps(data,ensure_ascii=False)
+    response = HttpResponse(dic)
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
+    response['Access-Control-Max-Age'] = '2000'
+    response['Access-Control-Allow-Headers'] = '*'
+    return response
+
+def country_history(request):
+    citycode = eval(request.GET['code'])    
+    data = json.load(open("data/country/"+citycode+".json",encoding='utf-8'))
+    data = data['data']['historylist']
+    print(data)
+    dic = {}
+    dic['date'] = []
+    dic['conadd'] = []
+    dic['cureadd'] = []
+    dic['deathadd'] = []
+    dic['conNum'] = []
+    dic['cureNum'] = []
+    dic['deathNum'] = []
+    n = len(data)
+    for i in range(n-1,-1,-1):
+        dic['date'].append(data[i]['date'])
+        dic['conadd'].append(data[i]['conadd'])
+        dic['cureadd'].append(data[i]['cureadd'])
+        dic['deathadd'].append(data[i]['deathadd'])
+        dic['conNum'].append(data[i]['conNum'])
+        dic['cureNum'].append(data[i]['cureNum'])
+        dic['deathNum'].append(data[i]['deathNum'])
+    #return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
+    dic = json.dumps(dic,ensure_ascii=False)
     response = HttpResponse(dic)
     response['Access-Control-Allow-Origin'] = '*'
     response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
