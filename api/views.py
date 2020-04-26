@@ -223,7 +223,6 @@ def country_history(request):
         dic['conNum'].append(data[i]['conNum'])
         dic['cureNum'].append(data[i]['cureNum'])
         dic['deathNum'].append(data[i]['deathNum'])
-    #return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
     dic = json.dumps(dic,ensure_ascii=False)
     response = HttpResponse(dic)
     response['Access-Control-Allow-Origin'] = '*'
