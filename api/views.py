@@ -231,6 +231,54 @@ def country_history(request):
     response['Access-Control-Allow-Headers'] = '*'
     return response
     
+def province_history(request):
+    pro = eval(request.GET['name']) 
+    data = json.load(open("data/sina.json",encoding='utf-8'))
+    province = ''
+    for i in range(len(data['data']['list'])):
+        if data['data']['list'][i]['name']==pro:
+            province = data['data']['list'][i]['ename']
+    data = json.load(open("data/province/"+province+".json",encoding='utf-8'))
+    data = data['timeline']    
+    dic = {}
+    dic['date'] = []
+    dic['conadd'] = []
+    dic['cureadd'] = []
+    dic['deathadd'] = []
+    dic['conNum'] = []
+    dic['cureNum'] = []
+    dic['deathNum'] = []
+    n = len(data)
+    i = 0
+    for a,b in data['cases'].items():
+        date = a.split('/')
+        day = ''
+        month = ''
+        if len(date[0])==1: month='0'+date[0] 
+        else: month=date[0]
+        if len(date[1])==1: day='0'+date[1] 
+        else: day=date[1]
+        dic['date'].append(month+'.'+day)
+        dic['conNum'].append(data['cases'][a])
+        dic['cureNum'].append(data['recovered'][a])
+        dic['deathNum'].append(data['deaths'][a])
+        if i>0:
+            dic['conadd'].append(dic['conNum'][i]-dic['conNum'][i-1])
+            dic['cureadd'].append(dic['cureNum'][i]-dic['cureNum'][i-1])
+            dic['deathadd'].append(dic['deathNum'][i]-dic['deathNum'][i-1])
+        else :
+            dic['conadd'].append(dic['conNum'][i])
+            dic['cureadd'].append(dic['cureNum'][i])
+            dic['deathadd'].append(dic['deathNum'][i])
+        i = i+1 
+    dic = json.dumps(dic,ensure_ascii=False)
+    response = HttpResponse(dic)
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
+    response['Access-Control-Max-Age'] = '2000'
+    response['Access-Control-Allow-Headers'] = '*'
+    return response
+    
 '''
 with open('history_China.json','w') as f:
     json.dump(dic,f,ensure_ascii=False)
