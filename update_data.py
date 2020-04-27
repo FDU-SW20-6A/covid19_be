@@ -148,8 +148,27 @@ def news_and_rumors():
     url = 'https://lab.isaaclin.cn/nCoV/api/rumors?num=1000&rumorType=2'
     filename = 'data/rumor2.json'    
     get_data(url,filename)
-      
-  
+    
+def province_history():
+    data = json.load(open("data/sina.json",encoding='utf-8'))
+    data = data['data']['list']
+    for i in range(len(data)):
+        province = data[i]['ename']
+        province_url = province
+        if province=='xizang': province_url='tibet'
+        if province=='neimenggu': province_url='inner mongolia'
+        if province=='shanxis': province_url='shaanxi'
+        if province=='xianggang': province_url='hong kong'
+        if province=='aomen': province_url='macau'
+        url = ''
+        if province=='taiwan': url = 'https://corona.lmao.ninja/v2/historical/twn?lastdays=all'
+        else : url = 'https://corona.lmao.ninja/v2/historical/chn/'+province_url+'?lastdays=all'
+        filename = 'data/province/'+province+'.json' 
+        get_data(url,filename)  
+        now = json.load(open(filename,encoding='utf-8'))
+        if 'message' in now.keys():
+            print(url,' ', data[i]['name'])
+        
 if __name__ == '__main__': 
 
     print("start")
@@ -159,6 +178,7 @@ if __name__ == '__main__':
     continent()
     scatter_diagram()
     news_and_rumors()
+    province_history()
     
     print("finish")
     endtime = datetime.datetime.now()
