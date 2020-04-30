@@ -3,6 +3,7 @@ import requests
 import json
 import datetime
 import time
+import random
 
 country_code = ['SCIT0039','SCUS0001','SCKR0082','SCIR0098','SCJP0081','SCFR0033','SCDE0049','SCES0034']
 country_list = ["意大利","美国","韩国","伊朗","日本","法国","德国","西班牙"]
@@ -139,15 +140,41 @@ def scatter_diagram():
         json.dump(dic,f,ensure_ascii=False)   
   
 def news_and_rumors():
+    '''
     url = 'https://lab.isaaclin.cn/nCoV/api/news?num=1000'
     filename = 'data/news.json'    
     get_data(url,filename)
     url = 'https://lab.isaaclin.cn/nCoV/api/rumors?num=1000&rumorType=0'
     filename = 'data/rumor0.json'    
     get_data(url,filename)
+    url = 'https://lab.isaaclin.cn/nCoV/api/rumors?num=1000&rumorType=1'
+    filename = 'data/rumor1.json'    
+    get_data(url,filename)
     url = 'https://lab.isaaclin.cn/nCoV/api/rumors?num=1000&rumorType=2'
     filename = 'data/rumor2.json'    
     get_data(url,filename)
+    '''
+    r0 = json.load(open("data/rumor0.json",encoding='utf-8'))
+    r1 = json.load(open("data/rumor1.json",encoding='utf-8'))
+    r2 = json.load(open("data/rumor2.json",encoding='utf-8'))
+    dic = {}
+    dic['results'] = []
+    for i in range(len(r0['results'])):
+        x = r0['results'][i]
+        x['type'] = 0
+        dic['results'].append(x)
+    for i in range(len(r1['results'])):
+        x = r1['results'][i]
+        x['type'] = 1
+        dic['results'].append(x)
+    for i in range(len(r2['results'])):
+        x = r2['results'][i]
+        x['type'] = 2
+        dic['results'].append(x)
+    random.shuffle(dic['results'])
+    with open('data/rumor.json','w',encoding='utf-8') as f:
+        json.dump(dic,f,ensure_ascii=False)   
+    
     
 def province_history():
     data = json.load(open("data/sina.json",encoding='utf-8'))
@@ -174,11 +201,11 @@ if __name__ == '__main__':
     print("start")
     starttime = datetime.datetime.now()
     
-    get_sina_api()  
-    continent()
-    scatter_diagram()
+    #get_sina_api()  
+    #continent()
+    #scatter_diagram()
     news_and_rumors()
-    province_history()
+    #province_history()
     
     print("finish")
     endtime = datetime.datetime.now()
