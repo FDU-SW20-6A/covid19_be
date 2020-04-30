@@ -201,6 +201,39 @@ def rumor2(request):
     response['Access-Control-Allow-Headers'] = '*'
     return response
 
+def countries_history(request):
+    country_list = ["Italy", "USA", "Korea", "Iran", "Japan", "France", "German", "Spain"]
+    countryCode = {
+    "Italy": 'SCIT0039',
+    "USA": 'SCUS0001',
+    "Korea": 'SCKR0082',
+    "Iran": 'SCIR0098',
+    "Japan": 'SCJP0081',
+    "France": 'SCFR0033',
+    "German": 'SCDE0049',
+    "Spain": 'SCES0034'
+    }
+    result = {}
+    for country in country_list:
+        citycode = countryCode[country]
+        data = json.load(open("data/country/"+citycode+".json",encoding='utf-8'))
+        data = data['data']['historylist']
+        dic = {}
+        dic['date'] = []
+        dic['conadd'] = []
+        n = len(data)
+        for i in range(n-1,-1,-1):
+            dic['date'].append(data[i]['date'])
+            dic['conadd'].append(data[i]['conadd'])
+        result[country] = dic
+    result = json.dumps(result,ensure_ascii=False)
+    response = HttpResponse(result)
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
+    response['Access-Control-Max-Age'] = '2000'
+    response['Access-Control-Allow-Headers'] = '*'
+    return response
+
 def country_history(request):
     citycode = eval(request.GET['code'])    
     data = json.load(open("data/country/"+citycode+".json",encoding='utf-8'))
