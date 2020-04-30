@@ -18,5 +18,6 @@ urlpatterns = [
     path('rumor/',views.rumor),
     path('country_history/',views.country_history),
     path('province_history/',views.province_history),
+    path('countries_history/',views.countries_history),
     ]
     
