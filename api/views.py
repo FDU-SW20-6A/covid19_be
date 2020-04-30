@@ -200,6 +200,16 @@ def rumor2(request):
     response['Access-Control-Max-Age'] = '2000'
     response['Access-Control-Allow-Headers'] = '*'
     return response
+    
+def rumor(request):
+    data = json.load(open("data/rumor.json",encoding='utf-8'))
+    dic = json.dumps(data,ensure_ascii=False)
+    response = HttpResponse(dic)
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
+    response['Access-Control-Max-Age'] = '2000'
+    response['Access-Control-Allow-Headers'] = '*'
+    return response
 
 def country_history(request):
     citycode = eval(request.GET['code'])    
