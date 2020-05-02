@@ -1,21 +1,18 @@
 from django.shortcuts import render,redirect
-from django import forms
 from django.conf import settings
+from django.http import HttpResponse
 from . import models
-import hashlib,datetime,pytz
-from captcha.fields import CaptchaField
+import hashlib,datetime,pytz,json
+from django.views.decorators.csrf import csrf_exempt,csrf_protect
 
-class UserForm(forms.Form):
-    username=forms.CharField(label='User Name',max_length=128)
-    password=forms.CharField(label='Password',max_length=256,widget=forms.PasswordInput)
-    captcha=CaptchaField(label='Captcha')
-
-class RegisterForm(forms.Form):
-    username=forms.CharField(label='User Name',max_length=128)
-    password1=forms.CharField(label='Password',max_length=256,widget=forms.PasswordInput)
-    password2=forms.CharField(label='Password',max_length=256,widget=forms.PasswordInput)
-    email=forms.EmailField(label='Email Address',widget=forms.EmailInput)
-    captcha=CaptchaField(label='Captcha')
+def myJsonResponse(ret):
+    json_data=json.dumps(ret)
+    response=HttpResponse(json_data)
+    response['Access-Control-Allow-Origin']='*'
+    response['Access-Control-Allow-Methods']='POST,GET,OPTIONS'
+    response['Access-Control-Max-Age']='2000'
+    response['Access-Control-Allow-Headers']='*'
+    return response
 
 def hash_code(s,salt='login_hash'):
     h=hashlib.sha256()
@@ -38,83 +35,75 @@ def send_email(email,code):
     msg.attach_alternative(htmlContent,'text/html')
     msg.send()
 
-def index(request):
-    pass
-    return render(request,'login/index.html')
-
+@csrf_exempt
 def login(request):
-    if request.session.get('is_login',None):
-        return redirect('/user/index/')
+    fail={'status':'error','type':'account','currentAuthority':'guest'}
     if request.method=='POST':
-        login_form=UserForm(request.POST)
-        message='All the attribute should be written.'
-        if login_form.is_valid():
-            username=login_form.cleaned_data['username']
-            password=login_form.cleaned_data['password']
-            #print(username,password)
-            try:
-                user=models.User.objects.get(name=username)
-                #print(user,user.has_confirmed)
+        request.session.flush()
+        data=json.loads(request.body)
+        print(data)
+        username=data['userName']
+        password=data['password']
+        ret=fail
+        #print(username,password)
+        try:
+            user=models.User.objects.get(name=username)
+            #print(user,user.has_confirmed)
 
-                if user.has_confirmed==False:
-                    message='This account has not accomplished email confirmation.'
-                    return render(request,'login/login.html',locals())
+            if user.has_confirmed==False:
+                message='This account named {} has not accomplished email confirmation.'.format(username)
 
-                if user.password==hash_code(password):
-                    request.session['is_login']=True
-                    request.session['user_id']=user.id
-                    request.session['user_name']=user.name
-                    return redirect('/user/index/')
-                else:
-                    message='Wrong password.'
-            except:
-                message='Username not existed.'
-        return render(request,'login/login.html',locals())
-    login_form=UserForm()
-    return render(request,'login/login.html',locals())
-
-def register(request):
-    if request.session.get('is_login',None):#Register while logged in is not permitted
-        return redirect('/user/index/')
-    if request.method=='POST':
-        register_form=RegisterForm(request.POST)
-        message='Please check your input.'
-        if register_form.is_valid():
-            username=register_form.cleaned_data['username']
-            password1=register_form.cleaned_data['password1']
-            password2=register_form.cleaned_data['password2']
-            email=register_form.cleaned_data['email']
-            if password1!=password2:
-                message='Two password input do not match.'
-                return render(request,'login/register.html',locals())
+            if user.password==hash_code(password):
+                request.session['is_login']=True
+                request.session['user_id']=user.id
+                request.session['user_name']=user.name
+                ret={'status':'ok','type':'account','currentAuthority':user.authority}
             else:
-                same_name_user=models.User.objects.filter(name=username)
-                if same_name_user:
-                    message='Username already existed.'
-                    return render(request,'login/register.html',locals())
+                message='Wrong password. username:{}'.format(username)
+        except:
+            message='Username not existed.'
+        #print(message)
+
+        return myJsonResponse(ret)
+
+@csrf_exempt
+def register(request):
+    fail={'status':'error','type':'register'}
+    if request.method=='POST':
+        ret=fail
+        data=json.loads(request.body)
+        username=data['username']
+        password1=data['password1']
+        password2=data['password2']
+        authority=data['authority']
+        email=data['email']
+        if password1!=password2:
+            message='Two password input do not match.\nusername:{}\npassword1:{}\npassword2:{}'.format(username,password1,password2)
+        else:
+            same_name_user=models.User.objects.filter(name=username)
+            if same_name_user:
+                message='Username \'{}\' already existed.'.format(username)
+            else:
                 same_email_user=models.User.objects.filter(email=email)
                 if same_email_user:
-                    message='This email address has been used.'
-                    return render(request,'login/register.html',locals())
+                    message='The email address \'{}\' has been used.'.format(email)
+                else:
+                    new_user=models.User.objects.create(
+                        name=username,
+                        password=hash_code(password1),
+                        email=email,
+                        authority=authority,
+                        has_confirmed=True,
+                    )
+                    message='Successfully registered. username:{}'.format(username)
+                    ret={'status':'ok','type':'register'}
+        print(message)
+        return myJsonResponse(ret)
 
-                new_user=models.User.objects.create(
-                    name=username,
-                    password=hash_code(password1),
-                    email=email
-                )
-
-                code=makeConfirmString(new_user)
-                send_email(email,code)
-                message='Please enter your email account to accomplish the confirmation.'
-                return render(request,'login/confirm.html',locals())
-    register_form=RegisterForm()
-    return render(request,'login/register.html',locals())
-
+@csrf_exempt
 def logout(request):
-    if not request.session.get('is_login',None):
-        return redirect('/user/index/')
     request.session.flush()
-    return redirect('/user/index/')
+    return myJsonResponse({'status':'ok','type':'logout'})
 
 def userConfirm(request):
     code=request.GET.get('code',None)

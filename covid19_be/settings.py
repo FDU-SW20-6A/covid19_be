@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'nearby',
     'rest_framework',
     'login',
-    'captcha',
 ]
 
 MIDDLEWARE = [

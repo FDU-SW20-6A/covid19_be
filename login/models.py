@@ -6,6 +6,7 @@ class User(models.Model):
     email=models.EmailField(unique=True)
     created_time=models.DateTimeField(auto_now_add=True)
     has_confirmed=models.BooleanField(default=False)
+    authority=models.CharField(max_length=10,default='user')
 
     def __str__(self):
         return self.name

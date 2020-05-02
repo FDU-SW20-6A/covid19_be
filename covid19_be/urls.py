@@ -22,5 +22,4 @@ urlpatterns = [
     path('nearby/',include('nearby.urls')),
     path('api/',include('api.urls')),
     path('user/',include('login.urls')),
-    url(r'^captcha',include('captcha.urls'))
 ]

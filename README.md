@@ -2,79 +2,107 @@
 
 official back-end repo
 
-## é¡¹ç›®è¿è¡Œæ–¹æ³•
+## ÏîÄ¿ÔËĞĞ·½·¨
 
-å…ˆå†³æ¡ä»¶ï¼šå®‰è£…Djangoæ¡†æ¶ï¼ŒPython 3.xï¼Œdjango-cors-headers
+ÏÈ¾öÌõ¼ş£º°²×°Django¿ò¼Ü£¬Python 3.x£¬django-cors-headers
 
-### å®‰è£…æ–¹æ³•
+### °²×°·½·¨
 
 ```bash
 #Windows:
-pip3 install django              #djangoå®‰è£…å‘½ä»¤
-pip3 install django-cors-headers #django-cors-headerså®‰è£…å‘½ä»¤
+pip3 install django              #django°²×°ÃüÁî
+pip3 install django-cors-headers #django-cors-headers°²×°ÃüÁî
 
-#Mac(æœªå°è¯•):
-sudo easy_install pip            #å®‰è£…pipï¼ˆå¦‚æœå·²å®‰è£…å¯è·³è¿‡ï¼‰
-pip3 install django              #djangoå®‰è£…å‘½ä»¤
-pip3 install django-cors-headers #django-cors-headerså®‰è£…å‘½ä»¤
-pip3 install djangorestframework #django rest frameworkå®‰è£…å‘½ä»¤
+#Mac(Î´³¢ÊÔ):
+sudo easy_install pip            #°²×°pip£¨Èç¹ûÒÑ°²×°¿ÉÌø¹ı£©
+pip3 install django              #django°²×°ÃüÁî
+pip3 install django-cors-headers #django-cors-headers°²×°ÃüÁî
+pip3 install djangorestframework #django rest framework°²×°ÃüÁî
 ```
 
-### è¿è¡Œæ–¹æ³•
+### ÔËĞĞ·½·¨
 
 ```bash
-covid19_be>$ python3 manage.py runserver <ç«¯å£å># åç«¯ç›®å‰ä½¿ç”¨ç«¯å£8001
+covid19_be>$ python3 manage.py runserver <¶Ë¿ÚÃû># ºó¶ËÄ¿Ç°Ê¹ÓÃ¶Ë¿Ú8001
 ```
 
-éšåè®¿é—®`http://localhost:<ç«¯å£å>`å³å¯ã€‚<br>
-å»ºè®®å‰ç«¯åœ¨æ— ç—•æ¨¡å¼ä¸‹å¯åŠ¨npmã€‚
+Ëæºó·ÃÎÊ`http://localhost:<¶Ë¿ÚÃû>`¼´¿É¡£<br>
+½¨ÒéÇ°¶ËÔÚÎŞºÛÄ£Ê½ÏÂÆô¶¯npm¡£
 
-## é™„è¿‘ç–«æƒ…
+## ¸½½üÒßÇé
 
-### è·¯å¾„
+### Â·¾¶
 
 covid19_be/nearby
 
-### å®Œæˆè¿›åº¦
+### Íê³É½ø¶È
 
-åŸºæœ¬å®Œæˆï¼Œä¸‹ä¸€æ­¥åŠ å…¥è°ƒç”¨æ–°æµªAPIï¼Œå®ç°è¿”å›å½“åœ°ç–«æƒ…æ•°æ®åŠŸèƒ½ã€‚
+ÒÑÍê³É¡£
 
-å·²å®Œæˆã€‚ä¸‹ä¸€æ­¥å‡†å¤‡å‰åç«¯è”è°ƒã€‚
+Ç°ºó¶ËÁªµ÷»ù±¾Íê³É¡£´æÔÚÒ»Ğ©ĞşÑ§´íÎó£¨µØÍ¼ĞÅÏ¢ºìµãÓĞÊ±²»ÏÔÊ¾£©¡£
 
-å‰åç«¯è”è°ƒåŸºæœ¬å®Œæˆã€‚å­˜åœ¨ä¸€äº›ç„å­¦é”™è¯¯ï¼ˆåœ°å›¾ä¿¡æ¯çº¢ç‚¹æœ‰æ—¶ä¸æ˜¾ç¤ºï¼‰ã€‚
+### µ÷ÓÃ·½·¨
 
-å¯èƒ½å­˜åœ¨çš„åˆ†æ­§ï¼š
-
-æ‰€åœ¨åœ°ä¸ºç›´è¾–å¸‚æ—¶è¿”å›ç›´è¾–å¸‚ä¿¡æ¯è¿˜æ˜¯å¸‚è¾–åŒºä¿¡æ¯ã€‚
-
-ç›®å‰æ ¹æ®å‰ç«¯è°ƒç”¨APIçš„é€»è¾‘ï¼Œå½“ç”¨æˆ·æ‰€åœ¨åœ°ä¸ºç›´è¾–å¸‚æ—¶ï¼Œå‰ç«¯è¿”å›å¸‚è¾–åŒºä»£ç ï¼Œåç«¯æŸ¥è¯¢å¸‚è¾–åŒºç–«æƒ…ä¿¡æ¯ï¼›å½“ç”¨æˆ·æ‰€åœ¨åœ°ä¸ä¸ºç›´è¾–å¸‚æ—¶ï¼Œå‰ç«¯è¿”å›æ‰€åœ¨åŒºå¿ä»£ç ï¼Œåç«¯æŸ¥è¯¢å…¶æ‰€å¤„åœ°çº§å¸‚ç–«æƒ…ä¿¡æ¯ï¼ˆæ•°æ®ä¸å¤Ÿç»†ï¼‰ã€‚
-
-### è°ƒç”¨æ–¹æ³•
-
-ä¾‹å¦‚ï¼šç»çº¬åæ ‡ä¸º`(30.05,120.66)`ï¼ˆå‰ç«¯äº‹å…ˆè°ƒç”¨é«˜å¾·åœ°å›¾APIå¾—çŸ¥è¯¥åœ°ç‚¹ä½äºç»å…´å¸‚ï¼ŒåŸå¸‚ä»£ç ä¸º330600ï¼‰çš„ç”¨æˆ·æŸ¥è¯¢é™„è¿‘ç–«æƒ…æ—¶ï¼Œå‰ç«¯è¾“å…¥çš„URLä¸º
+ÀıÈç£º¾­Î³×ø±êÎª`(30.05,120.66)`£¨Ç°¶ËÊÂÏÈµ÷ÓÃ¸ßµÂµØÍ¼APIµÃÖª¸ÃµØµãÎ»ÓÚÉÜĞËÊĞ£¬³ÇÊĞ´úÂëÎª330600£©µÄÓÃ»§²éÑ¯¸½½üÒßÇéÊ±£¬Ç°¶ËÊäÈëµÄURLÎª
 
 ```
 /nearby/?lat=30.05&lon=120.66&citycode=330600
 ```
 
-åç«¯è¿”å›ä¸€ä¸ªjsonå­—ç¬¦ä¸²ï¼š
+ºó¶Ë·µ»ØÒ»¸öjson×Ö·û´®£º
 
 ```json
-{"mapCenter": {"longitude": 120.66, "latitude": 30.05}, "address": "ç»å…´å¸‚", "markers": [{"position": {"longitude": 120.988632, "latitude": 30.154519}, "title": "å—å²­æ–°æ‘"}, {"position": {"longitude": 120.994444, "latitude": 30.148293}, "title": "æ¿æ¡¥è¥¿è·¯"}, {"position": {"longitude": 120.379159, "latitude": 30.284556}, "title": "å®‹éƒ½Â·æ™¨å…‰å›½é™…"}, {"position": {"longitude": 120.389487, "latitude": 30.300031}, "title": "æœ—è¯—Â·å›½é™…è¡—åŒº"}, {"position": {"longitude": 120.31792, "latitude": 30.295629}, "title": "ä¸ƒæ ¼å°åŒº"}, {"position": {"longitude": 121.130834, "latitude": 30.048196}, "title": "é”¦ç»£å®¶å›­(äºŒé«˜è·¯)"}, {"position": {"longitude": 121.147633, "latitude": 30.026232}, "title": "ä¼Šé¡¿å›½é™…åŸ"}, {"position": {"longitude": 121.133954, "latitude": 30.178446}, "title": "å¹³ç‹ç¤¾åŒº"}, {"position": {"longitude": 121.10753, "latitude": 30.245701}, "title": "å»ºäº”æ‘"}, {"position": {"longitude": 120.814055, "latitude": 30.468319}, "title": "ä¸‰å‹æ‘"}], "city": "ç»å…´å¸‚", "totalCase": "42", "currentCase": "0", "nearDis": 33.68, "nearLoc": "å—å²­æ–°æ‘", "case1": 0, "case3": 0, "case5": 0}
+{"mapCenter": {"longitude": 120.66, "latitude": 30.05}, "address": "ÉÜĞËÊĞ", "markers": [{"position": {"longitude": 120.988632, "latitude": 30.154519}, "title": "ÄÏÁëĞÂ´å"}, {"position": {"longitude": 120.994444, "latitude": 30.148293}, "title": "°åÇÅÎ÷Â·"}, {"position": {"longitude": 120.379159, "latitude": 30.284556}, "title": "ËÎ¶¼¡¤³¿¹â¹ú¼Ê"}, {"position": {"longitude": 120.389487, "latitude": 30.300031}, "title": "ÀÊÊ«¡¤¹ú¼Ê½ÖÇø"}, {"position": {"longitude": 120.31792, "latitude": 30.295629}, "title": "Æß¸ñĞ¡Çø"}, {"position": {"longitude": 121.130834, "latitude": 30.048196}, "title": "½õĞå¼ÒÔ°(¶ş¸ßÂ·)"}, {"position": {"longitude": 121.147633, "latitude": 30.026232}, "title": "ÒÁ¶Ù¹ú¼Ê³Ç"}, {"position": {"longitude": 121.133954, "latitude": 30.178446}, "title": "Æ½ÍõÉçÇø"}, {"position": {"longitude": 121.10753, "latitude": 30.245701}, "title": "½¨Îå´å"}, {"position": {"longitude": 120.814055, "latitude": 30.468319}, "title": "ÈıÓÑ´å"}], "city": "ÉÜĞËÊĞ", "totalCase": "42", "currentCase": "0", "nearDis": 33.68, "nearLoc": "ÄÏÁëĞÂ´å", "case1": 0, "case3": 0, "case5": 0}
 ```
 
-å…¶ä¸­æ¯ä¸ªå­—æ®µçš„å«ä¹‰è§é™„è¿‘ç–«æƒ…APIæ–‡æ¡£ï¼š
+ÆäÖĞÃ¿¸ö×Ö¶ÎµÄº¬Òå¼û¸½½üÒßÇéAPIÎÄµµ£º
 
 https://mubu.com/doc/506MXg39K3t
 
-### markeræ•°é‡ä¿®æ”¹æ–¹æ³•
+### markerÊıÁ¿ĞŞ¸Ä·½·¨
 
-åœ¨covid19_be/nearby/views.pyä¸­ï¼Œç¬¬41è¡Œæ•°å®šä¹‰å˜é‡`markersNum`ï¼Œç›®å‰å€¼ä¸º10ã€‚ä¿®æ”¹è¯¥å˜é‡çš„å€¼å¯ä»¥æ§åˆ¶å‰ç«¯æ˜¾ç¤ºmarkerçš„æ•°é‡ã€‚
+ÔÚcovid19_be/nearby/views.pyÖĞ£¬µÚ41ĞĞÊı¶¨Òå±äÁ¿`markersNum`£¬Ä¿Ç°ÖµÎª10¡£ĞŞ¸Ä¸Ã±äÁ¿µÄÖµ¿ÉÒÔ¿ØÖÆÇ°¶ËÏÔÊ¾markerµÄÊıÁ¿¡£
 
-## æ–°æµªAPI
+## ĞÂÀËAPI
 
-### æ–‡æ¡£
+### ÎÄµµ
 
 https://share.mubu.com/doc/2kTqfaDApY7
 
 https://share.mubu.com/doc/2YKmJ6mXsh7
+
+## ×¢²áµÇÂ¼
+
+### Â·¾¶
+
+covid19_be/login
+
+### Íê³É½ø¶È
+
+ºó¶ËRESTful½Ó¿ÚµÄ×¢²áµÇÂ¼²¿·ÖÒÑĞ´ºÃ¡£µÇÂ¼²¿·ÖÒÑÍê³ÉÇ°ºó¶ËÁªµ÷¡£Ä¿Ç°ÕıÔÚµÈ´ıÇ°¶Ë×¢²á²¿·ÖÃ÷È·ĞèÇó¡£
+
+ÏÂÒ»²½×¼±¸Íê³ÉĞŞ¸ÄÃÜÂëºÍÓÊ¼şÑéÖ¤µÄ½Ó¿Ú¡£
+
+### µ÷ÓÃ·½·¨
+
+Ä¿Ç°Ç°¶ËfakeAccountLoginº¯Êı²ÉÓÃµÄÊÇÍ¨¹ıPOST´«µİjson²ÎÊı¡£ÉèµÇÂ¼Ê±ÊäÈëµÄÓÃ»§ÃûºÍÃÜÂë·Ö±ğÎªadminºÍant.design£¬ÔòÇ°¶Ë·¢ËÍµÄjson²ÎÊıÎª£º
+
+```json
+{
+    userName:"admin",
+    password:"ant.design",
+    type:"account"
+}
+```
+
+Ç°¶Ë½ÓÊÕµÄ·µ»ØÖµÍ¬ÑùÎªjson¸ñÊ½£¬µ±µÇÂ¼³É¹¦Ê±£¬ÄÚÈİÈçÏÂ£º
+
+```json
+{
+    status:"ok",
+    type:"account",
+    currentAuthority:"user"/"admin"
+}
+```
+
+ÆäÖĞcurrentAuthority²Â²âÓëÈ¨ÏŞÓĞ¹Ø¡£
