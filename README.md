@@ -85,11 +85,13 @@ covid19_be/login
 
 ### 调用方法
 
+#### 登录部分
+
 目前前端fakeAccountLogin函数采用的是通过POST传递json参数。设登录时输入的用户名和密码分别为admin和ant.design，则前端发送的json参数为：
 
 ```json
 {
-    userName:"admin",
+    userName:"admin",                 
     password:"ant.design",
     type:"account"
 }
@@ -99,10 +101,34 @@ covid19_be/login
 
 ```json
 {
-    status:"ok",
-    type:"account",
-    currentAuthority:"user"/"admin"
+    status:"ok",                      //状态有ok和error两种，对应登录成功与登录失败。
+    type:"account",                   //前端代码中出现的参数，意义不明。
+    currentAuthority:"user"/"admin"   //当前用户权限，（似乎）分为user,admin,guest三种。
 }
 ```
 
 其中currentAuthority猜测与权限有关。
+
+#### 注册部分
+
+前端需要提供json格式的参数，格式如下：
+
+```json
+{
+    username:           //用户名
+    password1:          //密码
+    password2:          //重复密码，两个密码不一致返回注册失败
+    email:              //邮箱，一个邮箱只能注册一个账号（后期可加入邮箱验证功能）
+    authority:          //用户权限（目前根据前端代码，分为admin和user两种权限）
+}
+```
+
+后端返回的json参数为：
+
+```json
+{
+    status:             //状态有ok和error两种，对应注册成功与注册失败
+    type:register       //仿照登录部分设置的参数，无具体意义
+}
+```
+
