@@ -87,6 +87,8 @@ covid19_be/login
 
 #### 登录部分
 
+URL：http://localhost:8001/user/login/
+
 目前前端fakeAccountLogin函数采用的是通过POST传递json参数。设登录时输入的用户名和密码分别为admin和ant.design，则前端发送的json参数为：
 
 ```json
@@ -110,6 +112,8 @@ covid19_be/login
 其中currentAuthority猜测与权限有关。
 
 #### 注册部分
+
+URL：http://localhost:8001/user/register/
 
 前端需要提供json格式的参数，格式如下：
 
