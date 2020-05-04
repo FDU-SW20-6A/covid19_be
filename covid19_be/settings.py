@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import logging
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,6 +25,11 @@ SECRET_KEY = '3ta@)cayd#@8vu+k79a%u_k9xujz6700&bjy2oc$$faa(36=2='
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+logging.basicConfig(
+    level = logging.DEBUG,
+    format ='%(asctime)s %(levelname)s %(message)s',
+)
 
 ALLOWED_HOSTS = ['*']
 
@@ -40,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'nearby',
     'rest_framework',
+    'login',
 ]
 
 MIDDLEWARE = [
@@ -150,3 +157,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS=False
+EMAIL_USE_SSL=True
+EMAIL_HOST='smtp.qq.com'
+EMAIL_PORT=465
+EMAIL_HOST_USER='covid19_mailapi@qq.com'
+EMAIL_HOST_PASSWORD='xohgarqxotecgafa'
+DEFAULT_FROM_EMAIL=EMAIL_HOST_USER
+CONFIRM_DAYS=7

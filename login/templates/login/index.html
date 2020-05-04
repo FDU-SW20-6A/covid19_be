@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Index</title>
+    </head>
+    <body>
+        <h1>Index Page</h1>
+        {% if request.session.is_login %}
+            <h2>Hello, {{request.session.user_name}}! Welcome Back!</h2>
+        {% else %}
+            <h2>You have not login yet.</h2>
+        {% endif %}
+        <p><a href="http://localhost:8001/user/login/">login</a></p>
+        <p><a href="http://localhost:8001/user/register/">register</a></p>
+        <p><a href="http://localhost:8001/user/logout/">logout</a></p>
+    </body>
+</html>
