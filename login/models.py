@@ -7,6 +7,7 @@ class User(models.Model):
     created_time=models.DateTimeField(auto_now_add=True)
     has_confirmed=models.BooleanField(default=False)
     authority=models.CharField(max_length=10,default='user')
+    regions=models.ManyToManyField('Region')
 
     def __str__(self):
         return self.name
@@ -28,3 +29,15 @@ class ConfirmString(models.Model):
         ordering=['-created_time']
         verbose_name='确认码'
         verbose_name_plural='确认码'
+
+class Region(models.Model):
+    name=models.CharField(max_length=64)
+    adcode=models.IntegerField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering=['adcode']
+        verbose_name='地区'
+        verbose_name_plural='地区'
