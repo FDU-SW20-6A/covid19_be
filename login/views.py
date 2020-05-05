@@ -2,11 +2,11 @@ from django.shortcuts import render,redirect
 from django.conf import settings
 from django.http import HttpResponse
 from . import models
-import hashlib,datetime,pytz,json
+import hashlib,datetime,pytz,json,csv
 from django.views.decorators.csrf import csrf_exempt,csrf_protect
 
 def myJsonResponse(ret):
-    json_data=json.dumps(ret)
+    json_data=json.dumps(ret,ensure_ascii=False)
     response=HttpResponse(json_data)
     response['Access-Control-Allow-Origin']='*'
     response['Access-Control-Allow-Methods']='POST,GET,OPTIONS'
@@ -129,3 +129,84 @@ def userConfirm(request):
         confirm.delete()
         message='Successfully confirmed.'
         return render(request,'login/confirm.html',locals())
+
+def inputdata(request):
+    fp=open(r'login/data/AMap_adcode.csv','r',encoding='gbk',errors='ignore')
+    dictReader=csv.DictReader(fp)
+    for row in dictReader:
+        models.Region.objects.get_or_create(
+            name=row['中文名'],
+            adcode=row['adcode']
+        )
+        print(row['中文名'],row['adcode'])
+    return myJsonResponse({'status':'ok'})
+
+def getSubscribe(request):
+    username=request.GET['username']
+    try:
+        user=models.User.objects.get(name=username)
+        regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
+        return myJsonResponse({
+            'status':'ok',
+            'type':'subscribe',
+            'content':regionsList,
+            })
+    except:
+        return myJsonResponse({'status':'error','type':'User {} not existed.'.format(username)})
+
+@csrf_exempt
+def addSubscribe(request):
+    if request.method=='POST':
+        data=json.loads(request.body)
+        username=data['username']
+        content=data['content']
+        try:
+            user=models.User.objects.get(name=username)
+        except:
+            return myJsonResponse({'status':'error','type':'User {} not existed.'.format(username)})
+        for adcode in content:
+            try:
+                region=models.Region.objects.get(adcode=adcode)
+            except:
+                return myJsonResponse({'status':'error','type':'adcode {} not existed.'.format(adcode)})
+            user.regions.add(region)
+        regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
+        return myJsonResponse({
+            'status':'ok',
+            'type':'subscribe',
+            'content':regionsList,
+        })
+    else:
+        return myJsonResponse({'status':'error','type':'Request method is not POST.'})
+
+@csrf_exempt
+def delSubscribe(request):
+    if request.method=='POST':
+        data=json.loads(request.body)
+        username=data['username']
+        isClear=eval(data['isClear'])
+        content=data['content']
+        try:
+            user=models.User.objects.get(name=username)
+        except:
+            return myJsonResponse({'status':'error','type':'User {} not existed.'.format(username)})
+        if isClear:
+            user.regions.clear()
+        else:
+            regions=user.regions.all()
+            for adcode in content:
+                try:
+                    region=models.Region.objects.get(adcode=adcode)
+                except:
+                    return myJsonResponse({'status':'error','type':'adcode {} not existed.'.format(adcode)})
+                if region not in regions:
+                    return myJsonResponse({'status':'error','type':'adcode {} not in user {}\'s subscribe list.'.format(adcode,username)})
+                user.regions.remove(region)
+        regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
+        return myJsonResponse({
+            'status':'ok',
+            'type':'subscribe',
+            'content':regionsList,
+        })
+    else:
+        return myJsonResponse({'status':'error','type':'Request method is not POST.'})

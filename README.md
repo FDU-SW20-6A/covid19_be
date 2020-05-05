@@ -79,9 +79,9 @@ covid19_be/login
 
 ### 完成进度
 
-后端RESTful接口的注册登录部分已写好。登录部分已完成前后端联调。目前正在等待前端注册部分明确需求。
+后端RESTful接口的注册登录部分已写好。前后端联调已完成。
 
-下一步准备完成修改密码和邮件验证的接口。
+下一步计划完成修改密码和邮件验证的接口。
 
 ### 调用方法
 
@@ -89,13 +89,15 @@ covid19_be/login
 
 URL：http://localhost:8001/user/login/
 
+http方法：POST
+
 目前前端fakeAccountLogin函数采用的是通过POST传递json参数。设登录时输入的用户名和密码分别为admin和ant.design，则前端发送的json参数为：
 
 ```json
 {
-    userName:"admin",                 
-    password:"ant.design",
-    type:"account"
+    "userName":"admin",                 
+    "password":"ant.design",
+    "type":"account"
 }
 ```
 
@@ -103,9 +105,9 @@ URL：http://localhost:8001/user/login/
 
 ```json
 {
-    status:"ok",                      //状态有ok和error两种，对应登录成功与登录失败。
-    type:"account",                   //前端代码中出现的参数，意义不明。
-    currentAuthority:"user"/"admin"   //当前用户权限，（似乎）分为user,admin,guest三种。
+    "status":"ok",                      /*状态有ok和error两种，对应登录成功与登录失败。*/
+    "type":"account",                   /*前端代码中出现的参数，意义不明。*/
+    "currentAuthority":"user"/"admin"   /*当前用户权限，（似乎）分为user,admin,guest三种。*/
 }
 ```
 
@@ -115,15 +117,17 @@ URL：http://localhost:8001/user/login/
 
 URL：http://localhost:8001/user/register/
 
+http方法：POST
+
 前端需要提供json格式的参数，格式如下：
 
 ```json
 {
-    username:           //用户名
-    password1:          //密码
-    password2:          //重复密码，两个密码不一致返回注册失败
-    email:              //邮箱，一个邮箱只能注册一个账号（后期可加入邮箱验证功能）
-    authority:          //用户权限（目前根据前端代码，分为admin和user两种权限）
+    "username":"",           /*用户名*/
+    "password1":"",          /*密码*/
+    "password2":"",          /*重复密码，两个密码不一致返回注册失败*/
+    "email":"",              /*邮箱，一个邮箱只能注册一个账号（后期可加入邮箱验证功能）*/
+    "authority":"",          /*用户权限（目前根据前端代码，分为admin和user两种权限）*/
 }
 ```
 
@@ -131,8 +135,87 @@ URL：http://localhost:8001/user/register/
 
 ```json
 {
-    status:             //状态有ok和error两种，对应注册成功与注册失败
-    type:register       //仿照登录部分设置的参数，无具体意义
+    "status":"ok/error",     /*状态有ok和error两种，对应注册成功与注册失败*/
+    "type":"register",       /*仿照登录部分设置的参数，无具体意义*/
+}
+```
+
+## 地区订阅
+
+### 路径
+
+covid19_be/login
+
+### 完成进度
+
+后端RESTful接口的添加订阅、查看订阅、删除订阅接口已写好。下一步准备前后端联调。
+
+### 调用方法
+
+#### 查看订阅
+
+URL：http://localhost:8001/user/subscribe/get/?username=
+
+http方法：GET
+
+后端返回的json参数为：
+
+```json
+{
+    "status":"ok/error",                /*当状态为error时无content字段*/
+    "type":"",                          /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为subscribe*/
+    "content":[{"name":"","adcode":"",}]/*返回订阅地区列表，字段分别为名称和地区代码*/
+}
+```
+
+#### 添加订阅
+
+URL：http://localhost:8001/user/subscribe/add/
+
+http方法：POST
+
+前端需要提供的json参数格式为：
+
+```json
+{
+    "username":"",       /*添加订阅的用户名*/
+    "content":["110101",]/*添加的订阅地区代码列表*/
+}
+```
+
+后端返回的json参数为：
+
+```json
+{
+    "status":"ok/error",                /*当状态为error时无content字段*/
+    "type":"",                          /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为subscribe*/
+    "content":[{"name":"","adcode":"",}]/*返回添加后的订阅地区列表，字段分别为名称和地区代码*/
+}
+```
+
+#### 删除订阅
+
+URL：http://localhost:8001/user/subscribe/delete/
+
+http方法：POST
+
+前端需要提供的json参数格式为：
+
+```json
+{
+    "username":"",         /*删除订阅的用户名*/
+    "isClear":"True/False",/*isClear=True时表示清空该用户的订阅列表*/
+    "content":["110101",]  /*删除的订阅地区代码列表，如果isClear=True的话无意义*/
+}
+```
+
+后端返回的json参数为：
+
+```json
+{
+    "status":"ok/error",                /*当状态为error时无content字段*/
+    "type":"",                          /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为subscribe*/
+    "content":[{"name":"","adcode":"",}]/*返回删除后的订阅地区列表，字段分别为名称和地区代码*/
 }
 ```
 
