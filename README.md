@@ -154,7 +154,7 @@ covid19_be/login
 
 #### 查看订阅
 
-URL：http://localhost:8001/user/subscribe/get/?username=
+URL：http://localhost:8001/user/subscribe/get/
 
 http方法：GET
 
@@ -178,7 +178,6 @@ http方法：POST
 
 ```json
 {
-    "username":"",       /*添加订阅的用户名*/
     "content":["110101",]/*添加的订阅地区代码列表*/
 }
 ```
@@ -203,7 +202,6 @@ http方法：POST
 
 ```json
 {
-    "username":"",         /*删除订阅的用户名*/
     "isClear":"True/False",/*isClear=True时表示清空该用户的订阅列表*/
     "content":["110101",]  /*删除的订阅地区代码列表，如果isClear=True的话无意义*/
 }
