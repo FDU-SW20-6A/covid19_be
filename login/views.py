@@ -5,6 +5,9 @@ from . import models
 import hashlib,datetime,pytz,json,csv
 from django.views.decorators.csrf import csrf_exempt,csrf_protect
 
+def dictFail(s):
+    return {'status':'error','type':s}
+
 def myJsonResponse(ret):
     json_data=json.dumps(ret,ensure_ascii=False)
     response=HttpResponse(json_data)
@@ -38,8 +41,10 @@ def send_email(email,code):
 @csrf_exempt
 def login(request):
     fail={'status':'error','type':'account','currentAuthority':'guest'}
+    if request.session.get('is_login',None):
+        return myJsonResponse(dictFail('Already logined.'))
     if request.method=='POST':
-        request.session.flush()
+        #request.session.flush()
         data=json.loads(request.body)
         print(data)
         username=data['userName']
@@ -48,8 +53,6 @@ def login(request):
         #print(username,password)
         try:
             user=models.User.objects.get(name=username)
-            #print(user,user.has_confirmed)
-
             if user.has_confirmed==False:
                 message='This account named {} has not accomplished email confirmation.'.format(username)
 
@@ -68,7 +71,9 @@ def login(request):
 
 @csrf_exempt
 def register(request):
-    fail={'status':'error','type':'register'}
+    request.session.clear_expired()
+    if request.session.get('is_login',None):
+        return myJsonResponse(dictFail('Already logined.'))
     if request.method=='POST':
         ret=fail
         data=json.loads(request.body)
@@ -79,14 +84,17 @@ def register(request):
         email=data['email']
         if password1!=password2:
             message='Two password input do not match.\nusername:{}\npassword1:{}\npassword2:{}'.format(username,password1,password2)
+            return myJsonResponse(dictFail(message))
         else:
             same_name_user=models.User.objects.filter(name=username)
             if same_name_user:
                 message='Username \'{}\' already existed.'.format(username)
+                return myJsonResponse(dictFail(message))
             else:
                 same_email_user=models.User.objects.filter(email=email)
                 if same_email_user:
                     message='The email address \'{}\' has been used.'.format(email)
+                    return myJsonResponse(dictFail(message))
                 else:
                     new_user=models.User.objects.create(
                         name=username,
@@ -95,13 +103,12 @@ def register(request):
                         authority=authority,
                         has_confirmed=True,
                     )
-                    message='Successfully registered. username:{}'.format(username)
-                    ret={'status':'ok','type':'register'}
-        print(message)
-        return myJsonResponse(ret)
+                    return myJsonResponse({'status':'ok','type':'register'})
 
 @csrf_exempt
 def logout(request):
+    if not request.session.get('is_login',None):
+        return myJsonResponse(dictFail('Already logouted.'))
     request.session.flush()
     return myJsonResponse({'status':'ok','type':'logout'})
 
@@ -141,34 +148,39 @@ def inputdata(request):
         print(row['中文名'],row['adcode'])
     return myJsonResponse({'status':'ok'})
 
+@csrf_exempt
 def getSubscribe(request):
-    username=request.GET['username']
+    if not request.session.get('is_login',None):
+        return myJsonResponse(dictFail('Already logouted.'))
+    username=request.session['user_name']
     try:
         user=models.User.objects.get(name=username)
-        regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
-        return myJsonResponse({
-            'status':'ok',
-            'type':'subscribe',
-            'content':regionsList,
-            })
     except:
-        return myJsonResponse({'status':'error','type':'User {} not existed.'.format(username)})
+        return myJsonResponse(dictFail('User {} not existed.'.format(username)))
+    regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
+    return myJsonResponse({
+        'status':'ok',
+        'type':'subscribe',
+        'content':regionsList,
+        })
 
 @csrf_exempt
 def addSubscribe(request):
+    if not request.session.get('is_login',None):
+        return myJsonResponse(dictFail('Already logouted.'))
     if request.method=='POST':
         data=json.loads(request.body)
-        username=data['username']
+        username=request.session['user_name']
         content=data['content']
         try:
             user=models.User.objects.get(name=username)
         except:
-            return myJsonResponse({'status':'error','type':'User {} not existed.'.format(username)})
+            return myJsonResponse(dictFail('User {} not existed.'.format(username)))
         for adcode in content:
             try:
                 region=models.Region.objects.get(adcode=adcode)
             except:
-                return myJsonResponse({'status':'error','type':'adcode {} not existed.'.format(adcode)})
+                return myJsonResponse(dictFail('Adcode {} not existed.'.format(adcode)))
             user.regions.add(region)
         regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
         return myJsonResponse({
@@ -177,19 +189,21 @@ def addSubscribe(request):
             'content':regionsList,
         })
     else:
-        return myJsonResponse({'status':'error','type':'Request method is not POST.'})
+        return myJsonResponse(dictFail('Request method is not POST.'))
 
 @csrf_exempt
 def delSubscribe(request):
+    if not request.session.get('is_login',None):
+        return myJsonResponse(dictFail('Already logouted.'))
     if request.method=='POST':
         data=json.loads(request.body)
-        username=data['username']
+        username=request.session['user_name']
         isClear=eval(data['isClear'])
         content=data['content']
         try:
             user=models.User.objects.get(name=username)
         except:
-            return myJsonResponse({'status':'error','type':'User {} not existed.'.format(username)})
+            return myJsonResponse(dictFail('User {} not existed.'.format(username)))
         if isClear:
             user.regions.clear()
         else:
@@ -198,9 +212,9 @@ def delSubscribe(request):
                 try:
                     region=models.Region.objects.get(adcode=adcode)
                 except:
-                    return myJsonResponse({'status':'error','type':'adcode {} not existed.'.format(adcode)})
+                    return myJsonResponse(dictFail('Adcode {} not existed.'.format(adcode)))
                 if region not in regions:
-                    return myJsonResponse({'status':'error','type':'adcode {} not in user {}\'s subscribe list.'.format(adcode,username)})
+                    return myJsonResponse(dictFail('adcode {} not in user {}\'s subscribe list.'.format(adcode,username)))
                 user.regions.remove(region)
         regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
         return myJsonResponse({
@@ -209,4 +223,10 @@ def delSubscribe(request):
             'content':regionsList,
         })
     else:
-        return myJsonResponse({'status':'error','type':'Request method is not POST.'})
+        return myJsonResponse(dictFail('Request method is not POST.'))
+
+@csrf_exempt
+def getCurrentUser(request):
+    if not request.session.get('is_login',None):
+        return myJsonResponse(dictFail('Already logouted.'))
+    return myJsonResponse({'status':'ok','username':request.session['user_name']})

@@ -49,6 +49,9 @@ INSTALLED_APPS = [
     'login',
 ]
 
+#SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE=86400
+
 MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'corsheaders.middleware.CorsMiddleware',
