@@ -165,6 +165,36 @@ def getSubscribe(request):
         })
 
 @csrf_exempt
+def postSubscribe(request):
+    if not request.session.get('is_login',None):
+        return myJsonResponse(dictFail('Already logouted.'))
+    if request.method=='POST':
+        data=json.loads(request.body)
+        username=request.session['user_name']
+        content=data['content']
+        try:
+            user=models.User.objects.get(name=username)
+        except:
+            return myJsonResponse(dictFail('User {} not existed.'.format(username)))
+        regionsSet=set([x for x in user.regions.all()])
+        regionsPostSet=set()
+        for adcode in content:
+            try:
+                region=models.Region.objects.get(adcode=adcode)
+            except:
+                return myJsonResponse(dictFail('Adcode {} not existed.'.format(adcode)))
+            regionsPostSet.add(region)
+        for region in regionsPostSet-regionsSet: user.regions.add(region)
+        for region in regionsSet-regionsPostSet: user.regions.remove(region)
+        regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
+        return myJsonResponse({
+            'status':'ok',
+            'type':'subscribe',
+            'content':regionsList,
+        })
+    return myJsonResponse(dictFail('Request method is not POST.'))
+
+@csrf_exempt
 def addSubscribe(request):
     if not request.session.get('is_login',None):
         return myJsonResponse(dictFail('Already logouted.'))

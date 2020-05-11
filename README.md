@@ -4,7 +4,7 @@ official back-end repo
 
 ## 项目运行方法
 
-先决条件：安装Django框架，Python 3.x，django-cors-headers
+先决条件：安装Django框架，Python 3.x，django-cors-headers，djangorestframework
 
 ### 安装方法
 
@@ -150,6 +150,10 @@ covid19_be/login
 
 后端RESTful接口的添加订阅、查看订阅、删除订阅接口已写好。下一步准备前后端联调。
 
+### 相关文件地址
+
+地区代码文件：covid19_be/login/data/AMap_adcode.csv
+
 ### 调用方法
 
 #### 查看订阅
@@ -157,6 +161,34 @@ covid19_be/login
 URL：http://localhost:8001/user/subscribe/get/
 
 http方法：GET
+
+前端需要保证用户处于登录状态，并保留登录时的cookie。
+
+后端返回的json参数为：
+
+```json
+{
+    "status":"ok/error",                /*当状态为error时无content字段*/
+    "type":"",                          /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为subscribe*/
+    "content":[{"name":"","adcode":"",}]/*返回订阅地区列表，字段分别为名称和地区代码*/
+}
+```
+
+#### 修改订阅
+
+URL：http://localhost:8001/user/subscribe/post/
+
+http方法：POST
+
+前端需要提供的json参数格式为：
+
+```json
+{
+    "content":["110101",]/*该用户新的订阅地区代码列表*/
+}
+```
+
+前端需要保证用户处于登录状态，并保留登录时的cookie。
 
 后端返回的json参数为：
 
@@ -182,6 +214,8 @@ http方法：POST
 }
 ```
 
+前端需要保证用户处于登录状态，并保留登录时的cookie。
+
 后端返回的json参数为：
 
 ```json
@@ -206,6 +240,8 @@ http方法：POST
     "content":["110101",]  /*删除的订阅地区代码列表，如果isClear=True的话无意义*/
 }
 ```
+
+前端需要保证用户处于登录状态，并保留登录时的cookie。
 
 后端返回的json参数为：
 
