@@ -8,6 +8,9 @@ from django.views.decorators.csrf import csrf_exempt,csrf_protect
 def dictFail(s):
     return {'status':'error','type':s}
 
+def dictFailLogin(s):
+    return {'status':'error','type':s,'currentAuthority':'guest'}
+
 def myJsonResponse(ret):
     json_data=json.dumps(ret,ensure_ascii=False)
     response=HttpResponse(json_data)
@@ -40,34 +43,34 @@ def send_email(email,code):
 
 @csrf_exempt
 def login(request):
-    fail={'status':'error','type':'account','currentAuthority':'guest'}
     if request.session.get('is_login',None):
-        return myJsonResponse(dictFail('Already logined.'))
+        return myJsonResponse(dictFailLogin('Already logined.'))
     if request.method=='POST':
         #request.session.flush()
         data=json.loads(request.body)
         print(data)
         username=data['userName']
         password=data['password']
-        ret=fail
         #print(username,password)
         try:
             user=models.User.objects.get(name=username)
             if user.has_confirmed==False:
                 message='This account named {} has not accomplished email confirmation.'.format(username)
-
+                return myJsonResponse(dictFailLogin(message))
             if user.password==hash_code(password):
                 request.session['is_login']=True
                 request.session['user_id']=user.id
                 request.session['user_name']=user.name
                 ret={'status':'ok','type':'account','currentAuthority':user.authority}
+                return myJsonResponse(ret)
             else:
                 message='Wrong password. username:{}'.format(username)
+                return myJsonResponse(dictFailLogin(message))
         except:
             message='Username not existed.'
-        #print(message)
-
-        return myJsonResponse(ret)
+            return myJsonResponse(dictFailLogin(message))
+    else:
+        return myJsonResponse(dictFailLogin('Request method is not POST.'))
 
 @csrf_exempt
 def register(request):
@@ -75,7 +78,6 @@ def register(request):
     if request.session.get('is_login',None):
         return myJsonResponse(dictFail('Already logined.'))
     if request.method=='POST':
-        ret=fail
         data=json.loads(request.body)
         username=data['username']
         password1=data['password1']
@@ -104,6 +106,8 @@ def register(request):
                         has_confirmed=True,
                     )
                     return myJsonResponse({'status':'ok','type':'register'})
+    else:
+        return myJsonResponse(dictFail('Request method is not POST.'))
 
 @csrf_exempt
 def logout(request):
