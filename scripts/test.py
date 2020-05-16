@@ -52,5 +52,3 @@ json.dump(provdata,open(r'./data/localnews.json','w',encoding='utf-8'))
 s=bytes(json.dumps(provdata),encoding='utf-8').decode('unicode_escape')
 print(s)
 '''
-f=open(r'./data/localnews.json','r',encoding='unicode_escape')
-ab

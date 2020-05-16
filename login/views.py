@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.conf import settings
 from django.http import HttpResponse
 from . import models
-import hashlib,datetime,pytz,json,csv,datetime
+import hashlib,datetime,pytz,json,csv,time
 from django.views.decorators.csrf import csrf_exempt,csrf_protect
 
 def dictFail(s):
@@ -279,106 +279,123 @@ def getWeekly(request):
     cityList=[]
     isProvince={}
     treeData={}
-    day=datetime.date(2020,4,15)
-    dateList=[]
-    #dateList=[(day+datetime.timedelta(i)).strftime('%-m/%-d/%y') for i in range(15)]
-    for i in range(15):
-        dx=(day+datetime.timedelta(i)).timetuple()
-        ds='{}/{}/{}'.format(dx.tm_mon,dx.tm_mday,str(dx.tm_year)[2:])
-        dateList.append(ds)
-    lastdate=[(day+datetime.timedelta(i)).strftime('%m.%d')for i in range(1,8)]
-    thisdate=[(day+datetime.timedelta(i)).strftime('%m.%d')for i in range(8,15)]
+    provfileList={}
+    startday=datetime.date(2020,1,19)
     provstr=json.load(open(r'data/provincecode.json','r',errors='ignore'))
     newsdata=json.load(open(r'data/localnews.json','r',encoding='utf-8',errors='ignore'))
-
-    provfile={}
-    conNumList,econNumList,cureNumList,deathNumList,conNumAddList,econNumAddList,cureNumAddList,deathNumAddList=[],[],[],[],[],[],[],[]
-    for key,value in provstr.items():
+    for key in provstr.keys():
         provname=models.Region.objects.get(adcode=key+'0000').name
-        filestr=r'data/province/'+value+r'.json'
-        provdata=json.load(open(filestr,'r'))['timeline']
-        cases=[provdata['cases'][x] for x in dateList]
-        deaths=[provdata['deaths'][x]for x in dateList]
-        recovered=[provdata['recovered'][x] for x in dateList]
-        provfile[provname]={
-            'title':provname,
-            'conNum':cases[-1],
-            'econNum':cases[-1]-deaths[-1]-recovered[-1],
-            'cureNum':recovered[-1],
-            'deathNum':deaths[-1],
-            'conNumAdd':cases[-1]-cases[-2],
-            'econNumAdd':(cases[-1]-deaths[-1]-recovered[-1])-(cases[-2]-deaths[-2]-recovered[-2]),
-            'cureNumAdd':recovered[-1]-recovered[-2],
-            'deathNumAdd':deaths[-1]-deaths[-2],
-            'Conadd':{
-                'thisweek':[cases[i]-cases[i-1] for i in range(8,15)],
-                'lastweek':[cases[i]-cases[i-1] for i in range(1,8)],
-                'lastdate':lastdate,
-                'thisdate':thisdate
-            },
-            'ConNum':{
-                'thisweek':[cases[i] for i in range(8,15)],
-                'lastweek':[cases[i] for i in range(1,8)],
-                'lastdate':lastdate,
-                'thisdate':thisdate
-            },
-            'CureNum':{
-                'thisweek':[recovered[i] for i in range(8,15)],
-                'lastweek':[recovered[i] for i in range(1,8)],
-                'lastdate':lastdate,
-                'thisdate':thisdate
-            },
-            'DeathNum':{
-                'thisweek':[deaths[i] for i in range(8,15)],
-                'lastweek':[recovered[i] for i in range(1,8)],
-                'lastdate':lastdate,
-                'thisdate':thisdate
-            },
-            'news':newsdata[key],
-        }
-        tmp=provfile[provname]
-        conNumList.append((provname,tmp['conNum']))
-        conNumAddList.append((provname,tmp['conNumAdd']))
-        econNumList.append((provname,tmp['econNum']))
-        econNumAddList.append((provname,tmp['econNumAdd']))
-        cureNumList.append((provname,tmp['cureNum']))
-        cureNumAddList.append((provname,tmp['cureNumAdd']))
-        deathNumList.append((provname,tmp['deathNum']))
-        deathNumAddList.append((provname,tmp['deathNumAdd']))
+        provfileList[provname]=[]
+    for week in range(13):
+        dateList=[]
+        day=startday+datetime.timedelta(week*7)
+        for i in range(15):
+            dx=(day+datetime.timedelta(i)).timetuple()
+            ds='{}/{}/{}'.format(dx.tm_mon,dx.tm_mday,str(dx.tm_year)[2:])
+            dateList.append(ds)
+        lastdate=[(day+datetime.timedelta(i)).strftime('%m.%d')for i in range(1,8)]
+        thisdate=[(day+datetime.timedelta(i)).strftime('%m.%d')for i in range(8,15)]
 
-    conNumList=sorted(conNumList,key=lambda x:-x[1])
-    conNumAddList=sorted(conNumAddList,key=lambda x:-x[1])
-    econNumList=sorted(econNumList,key=lambda x:-x[1])
-    econNumAddList=sorted(econNumAddList,key=lambda x:-x[1])
-    cureNumList=sorted(cureNumList,key=lambda x:-x[1])
-    cureNumAddList=sorted(cureNumAddList,key=lambda x:-x[1])
-    deathNumList=sorted(deathNumList,key=lambda x:-x[1])
-    deathNumAddList=sorted(deathNumAddList,key=lambda x:-x[1])
+        provfile={}
+        conNumList,econNumList,cureNumList,deathNumList,conNumAddList,econNumAddList,cureNumAddList,deathNumAddList=[],[],[],[],[],[],[],[]
+        for key,value in provstr.items():
+            provname=models.Region.objects.get(adcode=key+'0000').name
+            filestr=r'data/province/'+value+r'.json'
+            provdata=json.load(open(filestr,'r'))['timeline']
+            cases=[provdata['cases'].get(x,0) for x in dateList]
+            deaths=[provdata['deaths'].get(x,0) for x in dateList]
+            recovered=[provdata['recovered'].get(x,0) for x in dateList]
+            newsList=[]
+            lastday=day+datetime.timedelta(14)
+            for news in newsdata[key]:
+                cmpdate=datetime.date.fromtimestamp(eval(news['pubDate'][:-3]))
+                if cmpdate>lastday:continue
+                newsList.append(news)
 
-    for i in range(len(conNumList)):
-        provname=conNumList[i][0]
-        provfile[provname]['conNumRank']=i+1
-    for i in range(len(econNumList)):
-        provname=econNumList[i][0]
-        provfile[provname]['econNumRank']=i+1
-    for i in range(len(cureNumList)):
-        provname=cureNumList[i][0]
-        provfile[provname]['cureNumRank']=i+1
-    for i in range(len(deathNumList)):
-        provname=deathNumList[i][0]
-        provfile[provname]['deathNumRank']=i+1
-    for i in range(len(conNumAddList)):
-        provname=conNumAddList[i][0]
-        provfile[provname]['conNumRankAdd']=i+1
-    for i in range(len(econNumAddList)):
-        provname=econNumAddList[i][0]
-        provfile[provname]['econNumRankAdd']=i+1
-    for i in range(len(cureNumAddList)):
-        provname=cureNumAddList[i][0]
-        provfile[provname]['cureNumRankAdd']=i+1
-    for i in range(len(deathNumAddList)):
-        provname=deathNumAddList[i][0]
-        provfile[provname]['deathNumRankAdd']=i+1
+            provfile[provname]={
+                'city':provname,
+                'date':lastday.strftime('%Y-%m-%d'),
+                'conNum':cases[-1],
+                'econNum':cases[-1]-deaths[-1]-recovered[-1],
+                'cureNum':recovered[-1],
+                'deathNum':deaths[-1],
+                'conNumAdd':cases[-1]-cases[-2],
+                'econNumAdd':(cases[-1]-deaths[-1]-recovered[-1])-(cases[-2]-deaths[-2]-recovered[-2]),
+                'cureNumAdd':recovered[-1]-recovered[-2],
+                'deathNumAdd':deaths[-1]-deaths[-2],
+                'Conadd':{
+                    'thisweek':[cases[i]-cases[i-1] for i in range(8,15)],
+                    'lastweek':[cases[i]-cases[i-1] for i in range(1,8)],
+                    'lastdate':lastdate,
+                    'thisdate':thisdate
+                },
+                'ConNum':{
+                    'thisweek':[cases[i] for i in range(8,15)],
+                    'lastweek':[cases[i] for i in range(1,8)],
+                    'lastdate':lastdate,
+                    'thisdate':thisdate
+                },
+                'CureNum':{
+                    'thisweek':[recovered[i] for i in range(8,15)],
+                    'lastweek':[recovered[i] for i in range(1,8)],
+                    'lastdate':lastdate,
+                    'thisdate':thisdate
+                },
+                'DeathNum':{
+                    'thisweek':[deaths[i] for i in range(8,15)],
+                    'lastweek':[recovered[i] for i in range(1,8)],
+                    'lastdate':lastdate,
+                    'thisdate':thisdate
+                },
+                'news':newsList,
+            }
+            tmp=provfile[provname]
+            conNumList.append((provname,tmp['conNum']))
+            conNumAddList.append((provname,tmp['conNumAdd']))
+            econNumList.append((provname,tmp['econNum']))
+            econNumAddList.append((provname,tmp['econNumAdd']))
+            cureNumList.append((provname,tmp['cureNum']))
+            cureNumAddList.append((provname,tmp['cureNumAdd']))
+            deathNumList.append((provname,tmp['deathNum']))
+            deathNumAddList.append((provname,tmp['deathNumAdd']))
+
+        conNumList=sorted(conNumList,key=lambda x:-x[1])
+        conNumAddList=sorted(conNumAddList,key=lambda x:-x[1])
+        econNumList=sorted(econNumList,key=lambda x:-x[1])
+        econNumAddList=sorted(econNumAddList,key=lambda x:-x[1])
+        cureNumList=sorted(cureNumList,key=lambda x:-x[1])
+        cureNumAddList=sorted(cureNumAddList,key=lambda x:-x[1])
+        deathNumList=sorted(deathNumList,key=lambda x:-x[1])
+        deathNumAddList=sorted(deathNumAddList,key=lambda x:-x[1])
+
+        for i in range(len(conNumList)):
+            provname=conNumList[i][0]
+            provfile[provname]['conNumRank']=i+1
+        for i in range(len(econNumList)):
+            provname=econNumList[i][0]
+            provfile[provname]['econNumRank']=i+1
+        for i in range(len(cureNumList)):
+            provname=cureNumList[i][0]
+            provfile[provname]['cureNumRank']=i+1
+        for i in range(len(deathNumList)):
+            provname=deathNumList[i][0]
+            provfile[provname]['deathNumRank']=i+1
+        for i in range(len(conNumAddList)):
+            provname=conNumAddList[i][0]
+            provfile[provname]['conNumRankAdd']=i+1
+        for i in range(len(econNumAddList)):
+            provname=econNumAddList[i][0]
+            provfile[provname]['econNumRankAdd']=i+1
+        for i in range(len(cureNumAddList)):
+            provname=cureNumAddList[i][0]
+            provfile[provname]['cureNumRankAdd']=i+1
+        for i in range(len(deathNumAddList)):
+            provname=deathNumAddList[i][0]
+            provfile[provname]['deathNumRankAdd']=i+1
+
+        for key in provstr.keys():
+            provname=models.Region.objects.get(adcode=key+'0000').name
+            provfileList[provname].append(provfile[provname])
 
     for region in regionsList:
         adcode=region['adcode']
@@ -388,7 +405,7 @@ def getWeekly(request):
         if isProvince.get(provcode,None):continue
         isProvince[provcode]=1
         provname=models.Region.objects.get(adcode=provcode+'0000').name
-        treeData[provname]=provfile[provname]
+        treeData[provname]=provfileList[provname]
     ans={
         'city':cityList,
         'treeData':treeData,
