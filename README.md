@@ -81,11 +81,11 @@ covid19_be/login
 
 后端RESTful接口的注册登录部分已写好。前后端联调已完成。
 
-下一步计划完成修改密码和邮件验证的接口。
+修改密码和邮件验证（注册、重置密码）的接口已写好。下一步准备前后端联调。
 
 ### 调用方法
 
-#### 登录部分
+#### 登录
 
 URL：http://localhost:8001/user/login/
 
@@ -106,14 +106,14 @@ http方法：POST
 ```json
 {
     "status":"ok",                      /*状态有ok和error两种，对应登录成功与登录失败。*/
-    "type":"account",                   /*前端代码中出现的参数，意义不明。*/
+    "type":"",                          /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为account*/
     "currentAuthority":"user"/"admin"   /*当前用户权限，（似乎）分为user,admin,guest三种。*/
 }
 ```
 
 其中currentAuthority猜测与权限有关。
 
-#### 注册部分
+#### 注册
 
 URL：http://localhost:8001/user/register/
 
@@ -136,9 +136,62 @@ http方法：POST
 ```json
 {
     "status":"ok/error",     /*状态有ok和error两种，对应注册成功与注册失败*/
-    "type":"register",       /*仿照登录部分设置的参数，无具体意义*/
+    "type":"",               /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为register*/
 }
 ```
+
+后端会生成一个验证码，并向该账号绑定的邮箱发送一封包含验证链接的邮件。用户点击链接后即可完成验证。
+
+#### 修改密码
+
+URL：http://localhost:8001/user/change/
+
+http方法：POST
+
+前端需要提供的json参数格式为：
+
+```json
+{
+    "oldpsw":"",		/*该用户现有密码，用来验证身份*/
+    "newpsw":"",		/*修改后的新密码*/
+}
+```
+
+前端在调用该接口时，用户应当处于登录状态，并将用户登录时的cookies传给后端。
+
+后端返回的json参数格式为：
+
+```json
+{
+    "status":"ok/error",     /*状态有ok和error两种，对应修改成功与修改失败*/
+    "type":"",               /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为changePassword*/
+}
+```
+
+#### 忘记密码
+
+URL：http://localhost:8001/user/reset/
+
+http方法：POST
+
+前端需要提供的json参数格式为：
+
+```json
+{
+    "username":"",		/*重置密码的账号用户名*/
+}
+```
+
+后端返回的json参数格式为：
+
+```json
+{
+    "status":"ok/error",	/*状态有ok和error两种，对应重置成功与重置失败*/
+    "type":"",			    /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为resetPassword*/
+}
+```
+
+后端会将该账号的密码重置为随机值，并向该账号绑定的邮箱发送一封包含随机密码的邮件。
 
 ## 地区订阅/生成周报
 
@@ -162,7 +215,7 @@ URL：http://localhost:8001/user/subscribe/get/
 
 http方法：GET
 
-前端需要保证用户处于登录状态，并保留登录时的cookie。
+前端在调用该接口时，用户应当处于登录状态，并将用户登录时的cookies传给后端。
 
 后端返回的json参数为：
 
@@ -188,7 +241,7 @@ http方法：POST
 }
 ```
 
-前端需要保证用户处于登录状态，并保留登录时的cookie。
+前端在调用该接口时，用户应当处于登录状态，并将用户登录时的cookies传给后端。
 
 后端返回的json参数为：
 
@@ -200,7 +253,7 @@ http方法：POST
 }
 ```
 
-#### 添加订阅
+#### 添加订阅（该接口暂时关闭）
 
 URL：http://localhost:8001/user/subscribe/add/
 
@@ -214,7 +267,7 @@ http方法：POST
 }
 ```
 
-前端需要保证用户处于登录状态，并保留登录时的cookie。
+前端在调用该接口时，用户应当处于登录状态，并将用户登录时的cookies传给后端。
 
 后端返回的json参数为：
 
@@ -226,7 +279,7 @@ http方法：POST
 }
 ```
 
-#### 删除订阅
+#### 删除订阅（该接口暂时关闭）
 
 URL：http://localhost:8001/user/subscribe/delete/
 
@@ -241,7 +294,7 @@ http方法：POST
 }
 ```
 
-前端需要保证用户处于登录状态，并保留登录时的cookie。
+前端在调用该接口时，用户应当处于登录状态，并将用户登录时的cookies传给后端。
 
 后端返回的json参数为：
 
@@ -259,6 +312,6 @@ URL：http://localhost:8001/user/weekly/get/
 
 http方法：GET
 
-前端需要保证用户处于登录状态，并保留登录时的cookie。
+前端在调用该接口时，用户应当处于登录状态，并将用户登录时的cookies传给后端。
 
 后端返回的json参数按照前端要求编写，此处省略。

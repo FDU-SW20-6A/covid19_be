@@ -2,24 +2,22 @@ from django.test import TestCase
 import requests,json
 
 data={
-    'userName':'xhs7700',
-    'password':'(644000)xhs'
+    'username':'hsxia18',
+    'password1':'123456',
+    'password2':'123456',
+    'authority':'user',
+    'email':'18307130090@fudan.edu.cn',
 }
 raw='http://localhost:8001/'
-url=raw+'user/login/'
-headers={'Content-Type':'application/json'}
-r=requests.post(url=url,headers=headers,data=json.dumps(data))
-print(r.text)
-x=r.cookies
-print(r.cookies)
+url=raw+'user/register/'
+resp=requests.post(url=url,json=data)
+print(resp.text)
+#cookies=resp.cookies
 
-url=raw+'user/subscribe/add/'
 data={
-    'content':['110106','110107']
+    'userName':'hsxia18',
+    'password':'123456',
 }
-r=requests.post(url=url,cookies=x,headers=headers,data=json.dumps(data))
-print(r.text)
-
-url=raw+'user/logout/'
-r=requests.get(url=url,cookies=x)
-print(r.text)
+url=raw+'user/login/'
+resp=requests.post(url=url,json=data)
+print(resp.text)

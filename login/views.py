@@ -32,11 +32,21 @@ def makeConfirmString(user):
     models.ConfirmString.objects.create(code=code,user=user,)
     return code
 
-def send_email(email,code):
+def sendRegisterEmail(email,username,code):
     from django.core.mail import EmailMultiAlternatives
-    subject='Registration Confirm'
+    subject='Registration Confirm: {}'.format(username)
     textContent='This is a registration confirmation.'
     htmlContent='<p>Click <a href="http://{}/user/confirm/?code={}" target="blank">this</a> to accomplish the confirmation.</p>'.format('localhost:8001',code,settings.CONFIRM_DAYS)
+    msg=EmailMultiAlternatives(subject,textContent,settings.DEFAULT_FROM_EMAIL,[email])
+    msg.attach_alternative(htmlContent,'text/html')
+    msg.send()
+
+def sendResetEmail(email,username,psw):
+    from django.core.mail import EmailMultiAlternatives
+    subject='Reset Password: {}'.format(username)
+    textContent='This includes a reset password for user {}'.format(username)
+    htmlContent='''<p>This includes a reset password for user {}.</p>
+    <p>Your temporary password is {}. Please change it after login.'''.format(username,psw)
     msg=EmailMultiAlternatives(subject,textContent,settings.DEFAULT_FROM_EMAIL,[email])
     msg.attach_alternative(htmlContent,'text/html')
     msg.send()
@@ -103,8 +113,10 @@ def register(request):
                         password=hash_code(password1),
                         email=email,
                         authority=authority,
-                        has_confirmed=True,
+                        has_confirmed=False,
                     )
+                    code=makeConfirmString(new_user)
+                    sendRegisterEmail(email,username,code)
                     return myJsonResponse({'status':'ok','type':'register'})
     else:
         return myJsonResponse(dictFail('Request method is not POST.'))
@@ -416,3 +428,45 @@ def getWeekly(request):
         'pagination':1,
     }
     return myJsonResponse(ans)
+
+@csrf_exempt
+def changePassword(request):
+    if not request.session.get('is_login',None):
+        return myJsonResponse(dictFail('Already logouted.'))
+    if request.method=='POST':
+        data=json.loads(request.body)
+        username=request.session['user_name']
+        oldpsw,newpsw=data['oldpsw'],data['newpsw']
+        try:
+            user=models.User.objects.get(name=username)
+        except:
+            return myJsonResponse(dictFail('Username not existed.'))
+        if user.password==hash_code(oldpsw):
+            user.password=hash_code(newpsw)
+            user.save()
+            return myJsonResponse({'status':'ok','type':'changePassword'})
+        else:
+            return myJsonResponse(dictFail('Wrong Password.'))
+    else:
+        return myJsonResponse(dictFail('Request method is not POST.'))
+
+@csrf_exempt
+def resetPassword(request):
+    if request.method=='POST':
+        data=json.loads(request.body)
+        username=data['username']
+        try:
+            user=models.User.objects.get(name=username)
+        except:
+            return myJsonResponse(dictFail('Username {} not existed.'.format(username)))
+        if user.has_confirmed==False:
+            return myJsonResponse(dictFail('This account named {} has not accomplished email confirmation.'.format(username)))
+        now=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        newpsw=hash_code(username,now)[:16]
+        sendResetEmail(user.email,username,newpsw)
+        user.password=hash_code(newpsw)
+        user.save()
+        return myJsonResponse({'status':'ok','type':'resetPassword'})
+
+    else:
+        return myJsonResponse(dictFail('Request method is not POST.'))
