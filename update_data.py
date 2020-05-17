@@ -49,6 +49,7 @@ def get_sina_api():
         if citycode!='': get_data(url,filename)
 
 def continent():
+    # 添加现存确诊
 
     continent_list = ['亚洲','欧洲','非洲','大洋洲','北美洲','南美洲','其它']
     con = json.load(open('data/continent.json',encoding='utf-8'))
@@ -56,7 +57,7 @@ def continent():
     dic = data['data']['worldlist']
     ans = [{} for i in range(7)]
     for i in range(len(continent_list)):
-        sum = [0 for j in range(8)]
+        sum = [0 for j in range(9)]
         ans[i]['country'] = []
         for j in range(len(dic)): 
             name = dic[j]['name']
@@ -64,14 +65,15 @@ def continent():
             if name in con and con[name]==continent_list[i]:
                 cdic = {}
                 if name=='中国':
-                    sum[0]+=int(data['data']['gntotal'])
-                    sum[1]+=int(data['data']['sustotal'])
-                    sum[2]+=int(data['data']['curetotal'])
-                    sum[3]+=int(data['data']['deathtotal'])
+                    sum[0]+=int(data['data']['gntotal'])  #累计确诊
+                    sum[1]+=int(data['data']['sustotal'])   
+                    sum[2]+=int(data['data']['curetotal'])    # 累计治愈
+                    sum[3]+=int(data['data']['deathtotal'])    # 累计死亡
                     sum[4]+=int(data['data']['add_daily']['addcon'])
                     sum[5]+=int(data['data']['add_daily']['addsus'])
                     sum[6]+=int(data['data']['add_daily']['addcure'])
                     sum[7]+=int(data['data']['add_daily']['adddeath'])
+                    sum[8]+=int(data['data']['econNum'])  # 现存确诊
                     cdic['conNum'] = data['data']['gntotal']
                     cdic['susNum'] = data['data']['sustotal']
                     cdic['cureNum'] = data['data']['curetotal']
@@ -80,6 +82,7 @@ def continent():
                     cdic['susadd'] = data['data']['add_daily']['addsus']
                     cdic['cureadd'] = data['data']['add_daily']['addcure']
                     cdic['deathadd'] = data['data']['add_daily']['adddeath']
+                    cdic['econNum'] = data['data']['econNum']
                 else :
                     sum[0]+=int(dic[j]['conNum'])
                     sum[1]+=int(dic[j]['susNum'])
@@ -89,6 +92,7 @@ def continent():
                     sum[5]+=int(dic[j]['susadd'])
                     sum[6]+=int(dic[j]['cureadd'])
                     sum[7]+=int(dic[j]['deathadd']) 
+                    sum[8]+=int(dic[j]['econNum'])
                     cdic['conNum'] = dic[j]['conNum']
                     cdic['susNum'] = dic[j]['susNum']
                     cdic['cureNum'] = dic[j]['cureNum']
@@ -97,6 +101,7 @@ def continent():
                     cdic['susadd'] = dic[j]['susadd']
                     cdic['cureadd'] = dic[j]['cureadd']
                     cdic['deathadd'] = dic[j]['deathadd']    
+                    cdic['econNum'] = dic[j]['econNum']
                 cdic['name'] = name 
                 ans[i]['country'].append(cdic)                           
         ans[i]['name'] = continent_list[i]
@@ -108,6 +113,7 @@ def continent():
         ans[i]['susadd'] = sum[5]
         ans[i]['cureadd'] = sum[6]      
         ans[i]['deathadd'] = sum[7]
+        ans[i]['econNum'] = sum[8]
     with open('data/continent_list.json','w',encoding='utf-8') as f:
         json.dump(ans,f,ensure_ascii=False)
   
