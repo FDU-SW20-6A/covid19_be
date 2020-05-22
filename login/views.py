@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.conf import settings
 from django.http import HttpResponse
 from . import models
-import hashlib,datetime,pytz,json,csv,time
+import hashlib,datetime,pytz,json,csv,time,validators
 from django.views.decorators.csrf import csrf_exempt,csrf_protect
 
 def dictFail(s):
@@ -14,10 +14,12 @@ def dictFailLogin(s):
 def myJsonResponse(ret):
     json_data=json.dumps(ret,ensure_ascii=False)
     response=HttpResponse(json_data)
+    '''
     response['Access-Control-Allow-Origin']='*'
     response['Access-Control-Allow-Methods']='POST,GET,OPTIONS'
     response['Access-Control-Max-Age']='2000'
     response['Access-Control-Allow-Headers']='*'
+    '''
     return response
 
 def hash_code(s,salt='login_hash'):
@@ -58,7 +60,7 @@ def login(request):
     if request.method=='POST':
         #request.session.flush()
         data=json.loads(request.body)
-        print(data)
+        #print(data)
         username=data['userName']
         password=data['password']
         #print(username,password)
@@ -74,7 +76,7 @@ def login(request):
                 ret={'status':'ok','type':'account','currentAuthority':user.authority}
                 return myJsonResponse(ret)
             else:
-                message='Wrong password. username:{}'.format(username)
+                message='Wrong password. Username: {}'.format(username)
                 return myJsonResponse(dictFailLogin(message))
         except:
             message='Username not existed.'
@@ -94,8 +96,20 @@ def register(request):
         password2=data['password2']
         authority=data['authority']
         email=data['email']
+        if username=='':
+            message='Username cannot be null.'
+            return myJsonResponse(dictFail(message))
+        if not validators.email(email):
+            message='Invalid email address.'
+            return myJsonResponse(dictFail(message))
+        if authority not in {'user','admin'}:
+            message='Invalid authority.'
+            return myJsonResponse(dictFail(message))
         if password1!=password2:
             message='Two password input do not match.\nusername:{}\npassword1:{}\npassword2:{}'.format(username,password1,password2)
+            return myJsonResponse(dictFail(message))
+        elif password1=='':
+            message='Password cannot be null.'
             return myJsonResponse(dictFail(message))
         else:
             same_name_user=models.User.objects.filter(name=username)
@@ -432,11 +446,14 @@ def getWeekly(request):
 @csrf_exempt
 def changePassword(request):
     if not request.session.get('is_login',None):
+        #print('oper;')
         return myJsonResponse(dictFail('Already logouted.'))
     if request.method=='POST':
         data=json.loads(request.body)
         username=request.session['user_name']
         oldpsw,newpsw=data['oldpsw'],data['newpsw']
+        if newpsw=='':
+            return myJsonResponse(dictFail('Invalid new password.'))
         try:
             user=models.User.objects.get(name=username)
         except:

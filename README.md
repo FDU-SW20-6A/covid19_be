@@ -52,7 +52,60 @@ covid19_be/nearby
 后端返回一个json字符串：
 
 ```json
-{"mapCenter": {"longitude": 120.66, "latitude": 30.05}, "address": "绍兴市", "markers": [{"position": {"longitude": 120.988632, "latitude": 30.154519}, "title": "南岭新村"}, {"position": {"longitude": 120.994444, "latitude": 30.148293}, "title": "板桥西路"}, {"position": {"longitude": 120.379159, "latitude": 30.284556}, "title": "宋都·晨光国际"}, {"position": {"longitude": 120.389487, "latitude": 30.300031}, "title": "朗诗·国际街区"}, {"position": {"longitude": 120.31792, "latitude": 30.295629}, "title": "七格小区"}, {"position": {"longitude": 121.130834, "latitude": 30.048196}, "title": "锦绣家园(二高路)"}, {"position": {"longitude": 121.147633, "latitude": 30.026232}, "title": "伊顿国际城"}, {"position": {"longitude": 121.133954, "latitude": 30.178446}, "title": "平王社区"}, {"position": {"longitude": 121.10753, "latitude": 30.245701}, "title": "建五村"}, {"position": {"longitude": 120.814055, "latitude": 30.468319}, "title": "三友村"}], "city": "绍兴市", "totalCase": "42", "currentCase": "0", "nearDis": 33.68, "nearLoc": "南岭新村", "case1": 0, "case3": 0, "case5": 0}
+{
+    "mapCenter": {"longitude": 120.66, "latitude": 30.05}, 
+    "address": "绍兴市", 
+    "markers": [
+        {
+            "position": {"longitude": 120.988632, "latitude": 30.154519}, 
+            "title": "南岭新村"
+        },
+        {
+            "position": {"longitude": 120.994444, "latitude": 30.148293}, 
+            "title": "板桥西路"
+        }, 
+        {
+            "position": {"longitude": 120.379159, "latitude": 30.284556}, 
+            "title": "宋都·晨光国际"
+        }, 
+        {
+            "position": {"longitude": 120.389487, "latitude": 30.300031},
+            "title": "朗诗·国际街区"
+        }, 
+        {
+            "position": {"longitude": 120.31792, "latitude": 30.295629},
+            "title": "七格小区"
+        }, 
+        {
+            "position": {"longitude": 121.130834, "latitude": 30.048196}, 
+            "title": "锦绣家园(二高路)"
+        },
+        {
+            "position": {"longitude": 121.147633, "latitude": 30.026232}, 
+            "title": "伊顿国际城"
+        }, 
+        {
+            "position": {"longitude": 121.133954, "latitude": 30.178446}, 
+            "title": "平王社区"
+        }, 
+        {
+            "position": {"longitude": 121.10753, "latitude": 30.245701},
+            "title": "建五村"
+        },
+        {
+            "position": {"longitude": 120.814055, "latitude": 30.468319},
+            "title": "三友村"
+        }
+    ], 
+    "city": "绍兴市",
+    "totalCase": "42", 
+    "currentCase": "0", 
+    "nearDis": 33.68,
+    "nearLoc": "南岭新村",
+    "case1": 0,
+    "case3": 0, 
+    "case5": 0
+}
 ```
 
 其中每个字段的含义见附近疫情API文档：
@@ -82,6 +135,8 @@ covid19_be/login
 后端RESTful接口的注册登录部分已写好。前后端联调已完成。
 
 修改密码和邮件验证（注册、重置密码）的接口已写好。下一步准备前后端联调。
+
+注册登录部分的测试已完成。
 
 ### 调用方法
 
@@ -131,6 +186,8 @@ http方法：POST
 }
 ```
 
+**注意：**注册时提供的密码**不能为空**。
+
 后端返回的json参数为：
 
 ```json
@@ -158,6 +215,8 @@ http方法：POST
 ```
 
 前端在调用该接口时，用户应当处于登录状态，并将用户登录时的cookies传给后端。
+
+**注意：**修改密码时提供的新密码**不能为空**。
 
 后端返回的json参数格式为：
 
