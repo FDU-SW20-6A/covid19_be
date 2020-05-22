@@ -446,12 +446,14 @@ def getWeekly(request):
 @csrf_exempt
 def changePassword(request):
     if not request.session.get('is_login',None):
-        print('oper;')
+        #print('oper;')
         return myJsonResponse(dictFail('Already logouted.'))
     if request.method=='POST':
         data=json.loads(request.body)
         username=request.session['user_name']
         oldpsw,newpsw=data['oldpsw'],data['newpsw']
+        if newpsw=='':
+            return myJsonResponse(dictFail('Invalid new password.'))
         try:
             user=models.User.objects.get(name=username)
         except:
