@@ -45,8 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'nearby',
-    'rest_framework',
     'login',
+    'rest_framework',
 ]
 
 #SESSION_EXPIRE_AT_BROWSER_CLOSE = True
