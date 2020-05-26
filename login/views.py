@@ -14,10 +14,12 @@ def dictFailLogin(s):
 def myJsonResponse(ret):
     json_data=json.dumps(ret,ensure_ascii=False)
     response=HttpResponse(json_data)
+    '''
     response['Access-Control-Allow-Origin']='http://127.0.0.1:8000'
     response['Access-Control-Allow-Methods']='POST,GET,OPTIONS'
     response['Access-Control-Max-Age']='2000'
     response['Access-Control-Allow-Headers']='*'
+    '''
     return response
 
 def hash_code(s,salt='login_hash'):
@@ -459,6 +461,7 @@ def changePassword(request):
         if user.password==hash_code(oldpsw):
             user.password=hash_code(newpsw)
             user.save()
+            request.session.flush()
             return myJsonResponse({'status':'ok','type':'changePassword'})
         else:
             return myJsonResponse(dictFail('Wrong Password.'))

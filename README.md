@@ -202,6 +202,23 @@ http方法：POST
 
 后端会生成一个验证码，并向该账号绑定的邮箱发送一封包含验证链接的邮件。用户点击链接后即可完成验证。
 
+#### 登出
+
+URL：http://localhost:8001/user/logout/
+
+http方法：POST
+
+前端在调用该接口时，用户应当处于登录状态，并将用户登录时的cookies传给后端。
+
+后端返回的json参数格式为：
+
+```json
+{
+    "status":"ok/error",     /*状态有ok和error两种，对应登出成功与登出失败*/
+    "type":"",               /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为logout*/
+}
+```
+
 #### 修改密码
 
 URL：http://localhost:8001/user/change/
