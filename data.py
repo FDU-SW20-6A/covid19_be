@@ -3,6 +3,7 @@ import csv,os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE','covid19_be.settings')
 django.setup()
 from nearby.models import city,pois
+city.objects.all().delete()
 with open(r'nearby\COVID-19-outbreak_area_data\data\City.csv','r',encoding='gbk',errors='ignore')as fp:
     dictReader=csv.DictReader(fp)
     for row in dictReader:
@@ -18,6 +19,7 @@ with open(r'nearby\COVID-19-outbreak_area_data\data\City.csv','r',encoding='gbk'
             cityCount=row['cityCount']
         )
 
+pois.objects.all().delete()
 with open(r'nearby\COVID-19-outbreak_area_data\data\Pois.csv','r',encoding='gbk',errors='ignore')as fq:
     dictReaderx=csv.DictReader(fq)
     for rowx in dictReaderx:

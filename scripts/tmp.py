@@ -1,4 +1,4 @@
-import validators
-s='xhs7700@126.com'
-flag=validators.email(s)
-flag
+def func(x,y):
+    print(x,y)
+x=3,4
+func(x)
