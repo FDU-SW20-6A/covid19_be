@@ -48,6 +48,15 @@ def country(request):
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False}) 
 '''
 
+def http_response(dic):
+    dic = json.dumps(dic,ensure_ascii=False)
+    response = HttpResponse(dic)
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
+    response['Access-Control-Max-Age'] = '2000'
+    response['Access-Control-Allow-Headers'] = '*'
+    return response
+
 def country(request):
     citycode = eval(request.GET['code'])    
     dic = json.load(open("data/country/"+citycode+".json",encoding='utf-8'))
@@ -69,13 +78,7 @@ def overall_China(request):
     dic['addecon_new'] = int(data['data']['add_daily']['addecon_new'])
     dic['addsus'] = int(data['data']['add_daily']['addsus'])
     dic['addhecon_new'] = int(data['data']['add_daily']['addhecon_new'])
-    dic = json.dumps(dic,ensure_ascii=False)
-    response = HttpResponse(dic)
-    response['Access-Control-Allow-Origin'] = '*'
-    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
-    response['Access-Control-Max-Age'] = '2000'
-    response['Access-Control-Allow-Headers'] = '*'
-    return response
+    return http_response(dic)
     
 def overall_world(request):
     data = json.load(open("data/sina.json",encoding='utf-8'))
@@ -133,13 +136,7 @@ def history(request):
         dic['conNumw'][n-1-i]= data[i]['certain']
         dic['cureNumw'][n-1-i] = data[i]['recure']
         dic['deathNumw'][n-1-i] = data[i]['die']   
-    dic = json.dumps(dic,ensure_ascii=False)
-    response = HttpResponse(dic)
-    response['Access-Control-Allow-Origin'] = '*'
-    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
-    response['Access-Control-Max-Age'] = '2000'
-    response['Access-Control-Allow-Headers'] = '*'
-    return response
+    return http_response(dic)
     
 def rate(request):
     data = json.load(open("data/sina.json",encoding='utf-8'))
@@ -162,54 +159,23 @@ def continent(request):
     
 def scatter_diagram(request):
     data = json.load(open("data/scatter_diagram.json",encoding='utf-8'))
-    dic = json.dumps(data,ensure_ascii=False)
-    response = HttpResponse(dic)
-    response['Access-Control-Allow-Origin'] = '*'
-    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
-    response['Access-Control-Max-Age'] = '2000'
-    response['Access-Control-Allow-Headers'] = '*'
-    return response
+    return http_response(data)
  
 def news(request):
     data = json.load(open("data/news.json",encoding='utf-8'))
-    dic = json.dumps(data,ensure_ascii=False)
-    #return JsonResponse(dic,json_dumps_params={'ensure_ascii':False},safe=False) 
-    response = HttpResponse(dic)
-    response['Access-Control-Allow-Origin'] = '*'
-    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
-    response['Access-Control-Max-Age'] = '2000'
-    response['Access-Control-Allow-Headers'] = '*'
-    return response
+    return http_response(data)
     
 def rumor0(request):
     data = json.load(open("data/rumor0.json",encoding='utf-8'))
-    dic = json.dumps(data,ensure_ascii=False)
-    response = HttpResponse(dic)
-    response['Access-Control-Allow-Origin'] = '*'
-    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
-    response['Access-Control-Max-Age'] = '2000'
-    response['Access-Control-Allow-Headers'] = '*'
-    return response
+    return http_response(data)
 
 def rumor2(request):
     data = json.load(open("data/rumor2.json",encoding='utf-8'))
-    dic = json.dumps(data,ensure_ascii=False)
-    response = HttpResponse(dic)
-    response['Access-Control-Allow-Origin'] = '*'
-    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
-    response['Access-Control-Max-Age'] = '2000'
-    response['Access-Control-Allow-Headers'] = '*'
-    return response
+    return http_response(data)
     
 def rumor(request):
     data = json.load(open("data/rumor.json",encoding='utf-8'))
-    dic = json.dumps(data,ensure_ascii=False)
-    response = HttpResponse(dic)
-    response['Access-Control-Allow-Origin'] = '*'
-    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
-    response['Access-Control-Max-Age'] = '2000'
-    response['Access-Control-Allow-Headers'] = '*'
-    return response
+    return http_response(data)
     
 def countries_history(request):
     country_list = ["Italy", "USA", "Korea", "Iran", "Japan", "France", "German", "Spain"]
@@ -236,19 +202,12 @@ def countries_history(request):
             dic['date'].append(data[i]['date'])
             dic['conadd'].append(data[i]['conadd'])
         result[country] = dic
-    result = json.dumps(result,ensure_ascii=False)
-    response = HttpResponse(result)
-    response['Access-Control-Allow-Origin'] = '*'
-    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
-    response['Access-Control-Max-Age'] = '2000'
-    response['Access-Control-Allow-Headers'] = '*'
-    return response
+    return http_response(result)
 
 def country_history(request):
     citycode = eval(request.GET['code'])    
     data = json.load(open("data/country/"+citycode+".json",encoding='utf-8'))
     data = data['data']['historylist']
-    print(data)
     dic = {}
     dic['date'] = []
     dic['conadd'] = []
@@ -266,13 +225,7 @@ def country_history(request):
         dic['conNum'].append(data[i]['conNum'])
         dic['cureNum'].append(data[i]['cureNum'])
         dic['deathNum'].append(data[i]['deathNum'])
-    dic = json.dumps(dic,ensure_ascii=False)
-    response = HttpResponse(dic)
-    response['Access-Control-Allow-Origin'] = '*'
-    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
-    response['Access-Control-Max-Age'] = '2000'
-    response['Access-Control-Allow-Headers'] = '*'
-    return response
+    return http_response(dic)
     
 def province_history(request):
     pro = eval(request.GET['name']) 
@@ -314,16 +267,6 @@ def province_history(request):
             dic['cureadd'].append(dic['cureNum'][i])
             dic['deathadd'].append(dic['deathNum'][i])
         i = i+1 
-    dic = json.dumps(dic,ensure_ascii=False)
-    response = HttpResponse(dic)
-    response['Access-Control-Allow-Origin'] = '*'
-    response['Access-Control-Allow-Methods'] = 'POST,GET,OPTIONS'
-    response['Access-Control-Max-Age'] = '2000'
-    response['Access-Control-Allow-Headers'] = '*'
-    return response
-    
-'''
-with open('history_China.json','w') as f:
-    json.dump(dic,f,ensure_ascii=False)
-'''    
+    return http_response(dic)
+ 
     
