@@ -53,6 +53,21 @@ def sendResetEmail(email,username,psw):
     msg.attach_alternative(htmlContent,'text/html')
     msg.send()
 
+def postContent(user,content):
+    regionsSet=set([x for x in user.regions.all()])
+    regionsPostSet=set()
+    for adcode in content:
+        try:
+            region=models.Region.objects.get(adcode=adcode)
+        except:
+            #print(adcode)
+            return False
+            #return myJsonResponse(dictFail('Adcode {} not existed.'.format(adcode)))
+        regionsPostSet.add(region)
+    for region in regionsPostSet-regionsSet: user.regions.add(region)
+    for region in regionsSet-regionsPostSet: user.regions.remove(region)
+    return True
+
 @csrf_exempt
 def login(request):
     if request.session.get('is_login',None):
@@ -167,17 +182,6 @@ def userConfirm(request):
         message='Successfully confirmed.'
         return render(request,'login/confirm.html',locals())
 
-def inputdata(request):
-    fp=open(r'login/data/AMap_adcode.csv','r',encoding='gbk',errors='ignore')
-    dictReader=csv.DictReader(fp)
-    for row in dictReader:
-        models.Region.objects.get_or_create(
-            name=row['中文名'],
-            adcode=row['adcode']
-        )
-        print(row['中文名'],row['adcode'])
-    return myJsonResponse({'status':'ok'})
-
 @csrf_exempt
 def getSubscribe(request):
     if not request.session.get('is_login',None):
@@ -206,16 +210,8 @@ def postSubscribe(request):
             user=models.User.objects.get(name=username)
         except:
             return myJsonResponse(dictFail('User {} not existed.'.format(username)))
-        regionsSet=set([x for x in user.regions.all()])
-        regionsPostSet=set()
-        for adcode in content:
-            try:
-                region=models.Region.objects.get(adcode=adcode)
-            except:
-                return myJsonResponse(dictFail('Adcode {} not existed.'.format(adcode)))
-            regionsPostSet.add(region)
-        for region in regionsPostSet-regionsSet: user.regions.add(region)
-        for region in regionsSet-regionsPostSet: user.regions.remove(region)
+        if not postContent(user,content):
+            return myJsonResponse(dictFail('Adcode not existed.'))
         regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
         return myJsonResponse({
             'status':'ok',
@@ -223,67 +219,6 @@ def postSubscribe(request):
             'content':regionsList,
         })
     return myJsonResponse(dictFail('Request method is not POST.'))
-
-@csrf_exempt
-def addSubscribe(request):
-    if not request.session.get('is_login',None):
-        return myJsonResponse(dictFail('Already logouted.'))
-    if request.method=='POST':
-        data=json.loads(request.body)
-        username=request.session['user_name']
-        content=data['content']
-        try:
-            user=models.User.objects.get(name=username)
-        except:
-            return myJsonResponse(dictFail('User {} not existed.'.format(username)))
-        for adcode in content:
-            try:
-                region=models.Region.objects.get(adcode=adcode)
-            except:
-                return myJsonResponse(dictFail('Adcode {} not existed.'.format(adcode)))
-            user.regions.add(region)
-        regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
-        return myJsonResponse({
-            'status':'ok',
-            'type':'subscribe',
-            'content':regionsList,
-        })
-    else:
-        return myJsonResponse(dictFail('Request method is not POST.'))
-
-@csrf_exempt
-def delSubscribe(request):
-    if not request.session.get('is_login',None):
-        return myJsonResponse(dictFail('Already logouted.'))
-    if request.method=='POST':
-        data=json.loads(request.body)
-        username=request.session['user_name']
-        isClear=eval(data['isClear'])
-        content=data['content']
-        try:
-            user=models.User.objects.get(name=username)
-        except:
-            return myJsonResponse(dictFail('User {} not existed.'.format(username)))
-        if isClear:
-            user.regions.clear()
-        else:
-            regions=user.regions.all()
-            for adcode in content:
-                try:
-                    region=models.Region.objects.get(adcode=adcode)
-                except:
-                    return myJsonResponse(dictFail('Adcode {} not existed.'.format(adcode)))
-                if region not in regions:
-                    return myJsonResponse(dictFail('adcode {} not in user {}\'s subscribe list.'.format(adcode,username)))
-                user.regions.remove(region)
-        regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
-        return myJsonResponse({
-            'status':'ok',
-            'type':'subscribe',
-            'content':regionsList,
-        })
-    else:
-        return myJsonResponse(dictFail('Request method is not POST.'))
 
 @csrf_exempt
 def getCurrentUser(request):
@@ -426,7 +361,7 @@ def getWeekly(request):
     for region in regionsList:
         adcode=region['adcode']
         provcode=adcode[:2]
-        if adcode[2:]=='0000':continue
+        #if adcode[2:]=='0000':continue
         cityList.append(region['name'])
         if isProvince.get(provcode,None):continue
         isProvince[provcode]=1

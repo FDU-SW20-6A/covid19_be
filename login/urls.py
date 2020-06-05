@@ -9,9 +9,6 @@ urlpatterns = [
     path('reset/',views.resetPassword),
     path('subscribe/get/',views.getSubscribe),
     path('subscribe/post/',views.postSubscribe),
-    #path('subscribe/add/',views.addSubscribe),
-    #path('subscribe/delete/',views.delSubscribe),
     path('weekly/get/',views.getWeekly),
-    #path('input/',views.inputdata),
     path('confirm/',views.userConfirm),
     ]
