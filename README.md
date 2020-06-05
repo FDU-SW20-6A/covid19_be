@@ -137,9 +137,9 @@ covid19_be/login
 
 后端RESTful接口的注册登录部分已写好。前后端联调已完成。
 
-修改密码和邮件验证（注册、重置密码）的接口已写好。下一步准备前后端联调。
+修改密码和邮件验证（注册、重置密码）的接口已写好。前后端联调已完成。
 
-注册登录部分的测试已完成。
+注册登录部分的单元测试已完成。
 
 ### 调用方法
 
@@ -280,7 +280,11 @@ covid19_be/login
 
 ### 完成进度
 
-后端RESTful接口的添加订阅、查看订阅、删除订阅接口已写好。下一步准备前后端联调。
+后端RESTful接口的添加订阅、查看订阅、删除订阅接口已写好。前后端联调已完成。
+
+后端生成周报的接口已写好。前后端联调已完成。
+
+地区订阅和生成周报的单元测试已完成。
 
 ### 相关文件地址
 
@@ -329,59 +333,6 @@ http方法：POST
     "status":"ok/error",                /*当状态为error时无content字段*/
     "type":"",                          /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为subscribe*/
     "content":[{"name":"","adcode":"",}]/*返回订阅地区列表，字段分别为名称和地区代码*/
-}
-```
-
-#### 添加订阅（该接口暂时关闭）
-
-URL：http://localhost:8001/user/subscribe/add/
-
-http方法：POST
-
-前端需要提供的json参数格式为：
-
-```json
-{
-    "content":["110101",]/*添加的订阅地区代码列表*/
-}
-```
-
-前端在调用该接口时，用户应当处于登录状态，并将用户登录时的cookies传给后端。
-
-后端返回的json参数为：
-
-```json
-{
-    "status":"ok/error",                /*当状态为error时无content字段*/
-    "type":"",                          /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为subscribe*/
-    "content":[{"name":"","adcode":"",}]/*返回添加后的订阅地区列表，字段分别为名称和地区代码*/
-}
-```
-
-#### 删除订阅（该接口暂时关闭）
-
-URL：http://localhost:8001/user/subscribe/delete/
-
-http方法：POST
-
-前端需要提供的json参数格式为：
-
-```json
-{
-    "isClear":"True/False",/*isClear=True时表示清空该用户的订阅列表*/
-    "content":["110101",]  /*删除的订阅地区代码列表，如果isClear=True的话无意义*/
-}
-```
-
-前端在调用该接口时，用户应当处于登录状态，并将用户登录时的cookies传给后端。
-
-后端返回的json参数为：
-
-```json
-{
-    "status":"ok/error",                /*当状态为error时无content字段*/
-    "type":"",                          /*当状态为error时，type字段显示错误信息；当状态为ok时，type字段为subscribe*/
-    "content":[{"name":"","adcode":"",}]/*返回删除后的订阅地区列表，字段分别为名称和地区代码*/
 }
 ```
 

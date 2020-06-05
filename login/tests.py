@@ -1,17 +1,54 @@
 from django.test import TestCase,Client
 from django.core import mail
 from .models import User,Region
-from .views import hash_code,dictFail,dictFailLogin
-import unittest,json
+from .views import hash_code,dictFail,dictFailLogin,postContent
+import unittest,json,csv
 
-def createUser(
-    name='testname',
-    psw='testpsw',
-    email='testname@test.com',
-    auth='user',
-    hasConf=True
-    ):
-    User.objects.create(name=name,password=hash_code(psw),email=email,authority=auth,has_confirmed=hasConf)
+def createUser(name='testname',psw='testpsw',email='testname@test.com',auth='user',hasConf=True):
+    user=User(name=name,password=hash_code(psw),email=email,authority=auth,has_confirmed=hasConf)
+    user.save()
+    return user
+
+def getSubBytesContent(content):
+    regionList=[]
+    for adcode in content:
+        region=Region.objects.get(adcode=adcode)
+        regionList.append({'name':region.name,'adcode':region.adcode})
+    data={
+        'status':'ok',
+        'type':'subscribe',
+        'content':regionList,
+    }
+    jsonstr=bytes(json.dumps(data),encoding='utf-8').decode('unicode_escape')
+    return bytes(jsonstr,encoding='utf-8')
+
+def getSubBytesUser(user):
+    regionsList=[{'name':x.name,'adcode':x.adcode} for x in user.regions.all()]
+    #print(regionsList)
+    data={
+        'status':'ok',
+        'type':'subscribe',
+        'content':regionsList,
+    }
+    jsonstr=bytes(json.dumps(data),encoding='utf-8').decode('unicode_escape')
+    return bytes(jsonstr,encoding='utf-8')
+
+def createRegionBase():
+    fp=open(r'login/data/AMap_adcode.csv','r',encoding='gbk',errors='ignore')
+    dictReader=csv.DictReader(fp)
+    for row in dictReader:
+        #name=bytes(row['中文名'],encoding='utf-8')
+        Region.objects.get_or_create(
+            name=row['中文名'],
+            adcode=row['adcode']
+        )
+
+def getUser(username):
+    try:
+        user=User.objects.get(name=username)
+    except:
+        return None
+    return user
 
 def dictFailBytes(s):
     data=bytes(json.dumps(dictFail(s)),encoding='utf-8')
@@ -50,6 +87,12 @@ def resetInput(name):
 
 def resetPost(self,data):
     return self.client.post(path='/user/reset/',data=data,content_type='application/json')
+
+def postSubInput(content):
+    return {'content':content}
+
+def postSubPost(self,data):
+    return self.client.post(path='/user/subscribe/post/',data=data,content_type='application/json')
 
 class LoginTest(TestCase):
     def setUp(self):
@@ -266,3 +309,84 @@ class ResetPasswordTest(TestCase):
         resp=resetPost(self,data)
         self.assertEqual(resp.status_code,200)
         self.assertEqual(resp.content,dictFailBytes('This account named hsxia18 has not accomplished email confirmation.'))
+
+class GetSubTest(TestCase):
+    def setUp(self):
+        createRegionBase()
+        user=createUser('xhs7700','123456','xhs7700@126.com')
+        self.client=Client()
+        content=['310109','320200','510000']
+        postContent(user,content)
+
+    def testNormal(self):
+        user=getUser('xhs7700')
+        data=loginInput('xhs7700','123456')
+        loginPost(self,data)
+        resp=self.client.get('/user/subscribe/get/')
+        self.assertEqual(resp.status_code,200)
+        #print(getSubBytesUser(user))
+        self.assertEqual(resp.content,getSubBytesUser(user))
+
+    def testAlreadyLogout(self):
+        resp=self.client.get('/user/subscribe/get/')
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.content,dictFailBytes('Already logouted.'))
+
+class PostSubTest(TestCase):
+    def setUp(self):
+        createRegionBase()
+        user=createUser('xhs7700','123456','xhs7700@126.com')
+        self.client=Client()
+        content=['310109','320200','510000']
+        postContent(user,content)
+
+    def testNormal(self):
+        content=['310110','320300','510000']
+        logindata=loginInput('xhs7700','123456')
+        postdata=postSubInput(content)
+        loginPost(self,logindata)
+        resp=postSubPost(self,postdata)
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.content,getSubBytesContent(content))
+
+    def testAlreadyLogout(self):
+        content=['310110','320300','510000']
+        postdata=postSubInput(content)
+        resp=postSubPost(self,postdata)
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.content,dictFailBytes('Already logouted.'))
+
+    def testGetMethod(self):
+        content=['310110','320300','510000']
+        logindata=loginInput('xhs7700','123456')
+        postdata=postSubInput(content)
+        loginPost(self,logindata)
+        resp=self.client.get('/user/subscribe/post/',postdata)
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.content,dictFailBytes('Request method is not POST.'))
+
+    def testInvalidAdcode(self):
+        content=['310110','320300','207419']
+        logindata=loginInput('xhs7700','123456')
+        postdata=postSubInput(content)
+        loginPost(self,logindata)
+        resp=postSubPost(self,postdata)
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.content,dictFailBytes('Adcode not existed.'))
+
+class GetWeeklyTest(TestCase):
+    def setUp(self):
+        createRegionBase()
+        user=createUser('xhs7700','123456','xhs7700@126.com')
+        self.client=Client()
+        content=['310109','320200','320300','510000','510100']
+        postContent(user,content)
+
+    def testNormal(self):
+        data=loginInput('xhs7700','123456')
+        loginPost(self,data)
+        resp=self.client.get('/user/weekly/get/')
+        respdata=json.loads(resp.content,encoding='utf-8')
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(len(respdata['city']),5)
+        self.assertEqual(len(respdata['treeData'].keys()),3)

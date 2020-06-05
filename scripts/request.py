@@ -1,10 +1,17 @@
 import requests,json
 raw='http://localhost:8001/'
-url=raw+'nearby/'
+url=raw+'user/login/'
 data={
-    'lon':120,
-    'lat':'30',
-    'citycode':'310110'
+    'userName':'xhs7700',
+    'password':'(644000)xhs',
+    'type':'account',
 }
-resp=requests.get(url,data)
+resp=requests.post(url,json=data)
+c=resp.cookies
+print(resp.text)
+url=raw+'user/subscribe/post/'
+data={
+    'content':['310109','320200','230000']
+}
+resp=requests.post(url,json=data,cookies=c)
 print(resp.text)
