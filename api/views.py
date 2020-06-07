@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from . import models
+import os
 import json
 import urllib.request
 
@@ -12,11 +13,15 @@ def sina_api(request):
 def province(request):
     data = json.load(open("data/sina.json",encoding='utf-8'))
     pro = eval(request.GET['province'])
-    pro_num = 0
+    pro_num = -1
     for i in range(len(data['data']['list'])):
         if data['data']['list'][i]['name']==pro or data['data']['list'][i]['ename']==pro:
             pro_num = i
-    dic = data['data']['list'][pro_num]
+    dic = {}
+    if pro_num!=-1 :
+        dic = data['data']['list'][pro_num]
+    else : 
+        return JsonResponse(dic,json_dumps_params={'ensure_ascii':False}) 
     dic.pop('hejian')
     for item in dic['city']:
         item.pop('citycode')
@@ -59,7 +64,10 @@ def http_response(dic):
 
 def country(request):
     citycode = eval(request.GET['code'])    
-    dic = json.load(open("data/country/"+citycode+".json",encoding='utf-8'))
+    dic = {}
+    filename = "data/country/"+citycode+".json"
+    if os.path.exists(filename):
+        dic = json.load(open(filename,encoding='utf-8'))
     return JsonResponse(dic,json_dumps_params={'ensure_ascii':False}) 
     
 def overall_China(request):
@@ -205,10 +213,14 @@ def countries_history(request):
     return http_response(result)
 
 def country_history(request):
-    citycode = eval(request.GET['code'])    
-    data = json.load(open("data/country/"+citycode+".json",encoding='utf-8'))
-    data = data['data']['historylist']
+    citycode = eval(request.GET['code'])  
     dic = {}
+    filename = "data/country/"+citycode+".json"
+    if os.path.exists(filename):
+        data = json.load(open(filename,encoding='utf-8'))
+    else : 
+        return http_response(dic)
+    data = data['data']['historylist']
     dic['date'] = []
     dic['conadd'] = []
     dic['cureadd'] = []
@@ -234,9 +246,13 @@ def province_history(request):
     for i in range(len(data['data']['list'])):
         if data['data']['list'][i]['name']==pro:
             province = data['data']['list'][i]['ename']
-    data = json.load(open("data/province/"+province+".json",encoding='utf-8'))
-    data = data['timeline']    
     dic = {}
+    filename = "data/province/"+province+".json"
+    if os.path.exists(filename):
+        data = json.load(open(filename,encoding='utf-8'))
+    else :
+        return http_response(dic)
+    data = data['timeline']     
     dic['date'] = []
     dic['conadd'] = []
     dic['cureadd'] = []
