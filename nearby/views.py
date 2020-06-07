@@ -62,7 +62,7 @@ def nearbyAsk(lon,lat,citycode,markersNum):
     #response=urllib.request.urlopen('https://interface.sina.cn/news/wap/fymap2020_data.d.json')
     #sinaData=json.loads(response.read().decode('utf-8'))
     sinaData=json.load(open(r'data/sina.json','r',encoding='utf-8'))
-    cityName,cityTotalNum,cityExistNum,isOversea='unknown','unknown','unknown',0
+    cityName,cityTotalNum,cityExistNum='unknown','unknown','unknown'
     for province in sinaData['data']['list']:
         for city in province['city']:
             if city['citycode']!='':
@@ -74,8 +74,6 @@ def nearbyAsk(lon,lat,citycode,markersNum):
             cityName=city['mapName']
             cityTotalNum=city['conNum']
             cityExistNum=city['econNum']
-            if city['jwsr']=='':isOversea=0
-            else:isOversea=1
 
     queryset=models.pois.objects.all()
     #print('querysetlength:',len(queryset))

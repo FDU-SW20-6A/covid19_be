@@ -274,6 +274,16 @@ class ChangePasswordTest(TestCase):
         self.assertEqual(resp.status_code,200)
         self.assertEqual(resp.content,respdata)
 
+    def testUserNotExist(self):
+        user=getUser('xhs7700')
+        logindata=loginInput('xhs7700','123456')
+        chpswdata=chpswInput('123456','1234567')
+        loginPost(self,logindata)
+        user.delete()
+        resp=chpswPost(self,chpswdata)
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.content,dictFailBytes('Username not existed.'))
+
 class ResetPasswordTest(TestCase):
     def setUp(self):
         createUser('xhs7700','123456','xhs7700@126.com')
@@ -332,6 +342,15 @@ class GetSubTest(TestCase):
         self.assertEqual(resp.status_code,200)
         self.assertEqual(resp.content,dictFailBytes('Already logouted.'))
 
+    def testUserNotExist(self):
+        user=getUser('xhs7700')
+        data=loginInput('xhs7700','123456')
+        loginPost(self,data)
+        user.delete()
+        resp=self.client.get('/user/subscribe/get/')
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.content,dictFailBytes('User xhs7700 not existed.'))
+
 class PostSubTest(TestCase):
     def setUp(self):
         createRegionBase()
@@ -348,6 +367,17 @@ class PostSubTest(TestCase):
         resp=postSubPost(self,postdata)
         self.assertEqual(resp.status_code,200)
         self.assertEqual(resp.content,getSubBytesContent(content))
+
+    def testUserNotExist(self):
+        content=['310110','320300','510000']
+        user=getUser('xhs7700')
+        logindata=loginInput('xhs7700','123456')
+        postdata=postSubInput(content)
+        loginPost(self,logindata)
+        user.delete()
+        resp=postSubPost(self,postdata)
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.content,dictFailBytes('User xhs7700 not existed.'))
 
     def testAlreadyLogout(self):
         content=['310110','320300','510000']
@@ -390,3 +420,17 @@ class GetWeeklyTest(TestCase):
         self.assertEqual(resp.status_code,200)
         self.assertEqual(len(respdata['city']),5)
         self.assertEqual(len(respdata['treeData'].keys()),3)
+
+    def testAlreadyLogout(self):
+        resp=self.client.get('/user/weekly/get/')
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.content,dictFailBytes('Already logouted.'))
+
+    def testUserNotExist(self):
+        user=getUser('xhs7700')
+        data=loginInput('xhs7700','123456')
+        loginPost(self,data)
+        user.delete()
+        resp=self.client.get('/user/weekly/get/')
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.content,dictFailBytes('User xhs7700 not existed.'))

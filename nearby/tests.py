@@ -87,8 +87,8 @@ def nearbyInitTestNegativeMarkersNum(self):
     self.assertEqual(resp.content,dictErrorBytes(lon,lat))
 
 def nearbyTestNormal(self):
-    lon,lat=120,30
-    data=nearbyInput(lon,lat,'310110',20)
+    lon,lat=121.463278,31.194057
+    data=nearbyInput(lon,lat,'310104',20)
     resp,respdata=nearbyGet(self,data)
     self.assertEqual(resp.status_code,200)
     self.assertEqual(respdata['mapCenter'],lonlatDict(lon,lat))
