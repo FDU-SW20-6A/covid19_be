@@ -28,6 +28,13 @@ class APITest(TestCase):
         self.assertEqual(code, 200)   
         self.assertEqual(content['value'], data['value'])
     
+    def test_province_error(self):
+        resp = self.client.get("/api/province/?province='jiangzhe'")
+        code = resp.status_code
+        content = json.loads(resp.content.decode('utf-8'))
+        self.assertEqual(code, 200)   
+        self.assertEqual(content, {})
+    
     def test_country(self):
         resp = self.client.get("/api/country/?code='SCUS0001'")
         code = resp.status_code
@@ -35,6 +42,13 @@ class APITest(TestCase):
         data = json.load(open("data/country/SCUS0001.json",encoding='utf-8'))
         self.assertEqual(code, 200) 
         self.assertEqual(content, data)
+    
+    def test_country_error(self):
+        resp = self.client.get("/api/country/?code='********'")
+        code = resp.status_code
+        content = json.loads(resp.content.decode('utf-8'))
+        self.assertEqual(code, 200) 
+        self.assertEqual(content, {})
     
     def test_overall_China(self):
         resp = self.client.get('/api/overall_China/')
@@ -180,6 +194,13 @@ class APITest(TestCase):
             dic.append(data[i]['conadd'])
         self.assertEqual(code, 200) 
         self.assertEqual(content['conadd'], dic)
+        
+    def test_country_history_error(self):
+        resp = self.client.get("/api/country_history/?code='********'")
+        code = resp.status_code
+        content = json.loads(resp.content.decode('utf-8'))
+        self.assertEqual(code, 200) 
+        self.assertEqual(content, {})
     
     def test_province_history(self):  
         resp = self.client.get("/api/province_history/?name='浙江'")
@@ -193,5 +214,12 @@ class APITest(TestCase):
             dic.append(data['cases'][a])
         self.assertEqual(code, 200)
         self.assertEqual(content['conNum'], dic)
+    
+    def test_province_history_error(self):  
+        resp = self.client.get("/api/province_history/?name='江浙'")
+        code = resp.status_code
+        content = json.loads(resp.content.decode('utf-8'))
+        self.assertEqual(code, 200)
+        self.assertEqual(content, {})
     
     
