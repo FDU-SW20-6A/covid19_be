@@ -284,6 +284,14 @@ class ChangePasswordTest(TestCase):
         self.assertEqual(resp.status_code,200)
         self.assertEqual(resp.content,dictFailBytes('Username not existed.'))
 
+    def testSamePsw(self):
+        logindata=loginInput('xhs7700','123456')
+        chpswdata=chpswInput('123456','123456')
+        loginPost(self,logindata)
+        resp=chpswPost(self,chpswdata)
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.content,dictFailBytes('New password cannot be the same with old password.'))
+
 class ResetPasswordTest(TestCase):
     def setUp(self):
         createUser('xhs7700','123456','xhs7700@126.com')
