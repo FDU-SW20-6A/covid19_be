@@ -73,12 +73,9 @@ def login(request):
     if request.session.get('is_login',None):
         return myJsonResponse(dictFailLogin('Already logined.'))
     if request.method=='POST':
-        #request.session.flush()
         data=json.loads(request.body)
-        #print(data)
         username=data['userName']
         password=data['password']
-        #print(username,password)
         try:
             user=models.User.objects.get(name=username)
             if user.has_confirmed==False:
@@ -381,7 +378,6 @@ def getWeekly(request):
 @csrf_exempt
 def changePassword(request):
     if not request.session.get('is_login',None):
-        #print('oper;')
         return myJsonResponse(dictFail('Already logouted.'))
     if request.method=='POST':
         data=json.loads(request.body)
@@ -389,6 +385,8 @@ def changePassword(request):
         oldpsw,newpsw=data['oldpsw'],data['newpsw']
         if newpsw=='':
             return myJsonResponse(dictFail('Invalid new password.'))
+        if newpsw==oldpsw:
+            return myJsonResponse(dictFail('New password cannot be the same with old password.'))
         try:
             user=models.User.objects.get(name=username)
         except:
